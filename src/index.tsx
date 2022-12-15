@@ -1,6 +1,6 @@
 import { ExtoleImpl } from './impl/ExtoleImpl';
-import type { Condition } from './impl/Condition';
-import type { Action } from './impl/Action';
+import type { Condition } from './Condition';
+import type { Action } from './Action';
 import type { AppEvent } from './impl/AppEvent';
 import type { Operation } from './impl/Operation';
 

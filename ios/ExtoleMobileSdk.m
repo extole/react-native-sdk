@@ -19,6 +19,22 @@ RCT_EXTERN_METHOD(fetchZone:(NSString *)zoneName withData:(NSDictionary *)data
         withResolver:(RCTPromiseResolveBlock)resolve
         withRejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(debug:(NSString *)message
+        withResolver:(RCTPromiseResolveBlock)resolve
+        withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(info:(NSString *)message
+        withResolver:(RCTPromiseResolveBlock)resolve
+        withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(warn:(NSString *)message
+        withResolver:(RCTPromiseResolveBlock)resolve
+        withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(error:(NSString *)message
+        withResolver:(RCTPromiseResolveBlock)resolve
+        withRejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(getJsonConfiguration:(RCTPromiseResolveBlock)resolve
         withRejecter:(RCTPromiseRejectBlock)reject)
 

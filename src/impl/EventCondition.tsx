@@ -1,4 +1,6 @@
-import type { AppEvent, Condition, Extole } from 'extole-mobile-sdk';
+import type { Condition } from '../Condition';
+import type { AppEvent } from './AppEvent';
+import type { ExtoleInternal } from './ExtoleInternal';
 
 export class EventCondition implements Condition {
   type = 'EVENT';
@@ -8,7 +10,7 @@ export class EventCondition implements Condition {
   has_data_vales: string[] = [];
   event_names: string[] = [];
 
-  test(event: AppEvent, _: Extole): boolean {
+  test(event: AppEvent, _: ExtoleInternal): boolean {
     console.trace('Event Condition was executed', event);
     return this.event_names.includes(event.name);
   }

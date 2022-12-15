@@ -1,7 +1,10 @@
 import WebView from 'react-native-webview';
-import type { Action, AppEvent, Extole } from 'extole-mobile-sdk';
+import type { Action } from '../Action';
+import type { AppEvent } from './AppEvent';
+import type { ExtoleInternal } from './ExtoleInternal';
 import { Dimensions } from 'react-native';
 import React from 'react';
+
 
 export class ViewFullScreenAction implements Action {
   type = 'VIEW_FULLSCREEN';
@@ -10,7 +13,7 @@ export class ViewFullScreenAction implements Action {
   zone_name = '';
   data: Record<string, string> = {};
 
-  execute(event: AppEvent, extole: Extole) {
+  execute(event: AppEvent, extole: ExtoleInternal) {
     console.trace('ViewFullScreen was executed');
     const zoneUrl = new URL(
       'https://' + extole.getProgramDomain() + '/zone/' + this.zone_name,

@@ -1,17 +1,23 @@
 import type { FetchResult } from './FetchResult';
 import type { Extole } from '../Extole';
-import type { ExtoleImpl } from './ExtoleImpl';
-import type { Action, Condition } from 'extole-mobile-sdk';
+import type { Action } from '../Action';
+import type { Condition } from '../Condition';
+import type { LogLevel } from 'src/LogLevel';
+import type { Logger } from '../Logger';
 
 export class Campaign implements Extole {
   campaignId: string;
   programLabel: string;
-  extole: ExtoleImpl;
+  extole: Extole;
 
-  constructor(extole: ExtoleImpl, campaignId: string, programLabel: string) {
+  constructor(extole: Extole, campaignId: string, programLabel: string) {
     this.campaignId = campaignId;
     this.programLabel = programLabel;
     this.extole = extole;
+  }
+
+  public setLogLevel(logLevel: LogLevel): void {
+    this.extole.setLogLevel(logLevel);
   }
 
   public fetchZone(zoneName: string): Promise<FetchResult> {
@@ -44,4 +50,9 @@ export class Campaign implements Extole {
   setViewElement(view: Element): void {
     this.extole.setViewElement(view);
   }
+
+  getLogger(): Logger {
+    return this.extole.getLogger();
+  }
+
 }

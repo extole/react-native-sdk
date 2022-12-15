@@ -1,6 +1,8 @@
 import type { FetchResult } from './impl/FetchResult';
-import type { Condition } from './impl/Condition';
-import type { Action } from './impl/Action';
+import type { Condition } from './Condition';
+import type { Action } from './Action';
+import type { LogLevel } from './LogLevel';
+import type { Logger } from './Logger';
 
 export interface Extole {
   getProgramDomain: () => string;
@@ -13,6 +15,10 @@ export interface Extole {
   identify: (email: string, params: Record<string, string>) => string;
 
   sendEvent: (eventName: string, params: Record<string, string>) => string;
+
+  setLogLevel: (logLevel: LogLevel) => void;
+
+  getLogger(): Logger
 
   registerCondition: (title: string, condition: Condition) => void;
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Button, Image, StyleSheet, View } from 'react-native';
-import { Extole } from 'extole-mobile-sdk';
+import { Extole } from '../../src/index';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -29,7 +29,7 @@ function ExtoleScreen() {
 function HomeScreen({ navigation }: { navigation: any }) {
   const [cta, setCta] = React.useState<Record<string, any> | undefined>();
   const [extoleView, setExtoleView] = React.useState<Element>(<View />);
-  extole.configureUIInteraction(extoleView, setExtoleView, () => {
+  extole.configure(extoleView, setExtoleView, () => {
     console.debug('Navigate');
     navigation.navigate('Promo');
   });
@@ -37,13 +37,12 @@ function HomeScreen({ navigation }: { navigation: any }) {
     extole
       .fetchZone('cta_prefetch')
       .then((result: Record<string, any>) => {
+        extole.getLogger().info('ReactNative Fetched CTA');
         setCta(result.zone.data);
       })
       .catch((error: Error) => {
-        console.log(
-          'There has been a problem with your fetch operation: ',
-          error,
-        );
+        extole.getLogger().error(
+          'There has been a problem with your fetch operation: ' + error);
       });
   }, []);
 

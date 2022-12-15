@@ -84,8 +84,23 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     }
 
     @ReactMethod
-    fun getLogger(): RNExtoleLogger {
-        return RNExtoleLogger(extole.getLogger())
+    fun debug(message: String) {
+        return extole.getLogger().debug(message)
+    }
+
+    @ReactMethod
+    fun info(message: String) {
+        return extole.getLogger().info(message)
+    }
+
+    @ReactMethod
+    fun warn(message: String) {
+        return extole.getLogger().warn(message)
+    }
+
+    @ReactMethod
+    fun error(message: String) {
+        return extole.getLogger().error(message)
     }
 
     @ReactMethod

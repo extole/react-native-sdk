@@ -45,6 +45,26 @@ class ExtoleMobileSdk: NSObject {
         }
     }
 
+    @objc(debug:withResolver:withRejecter:)
+    func debug(message: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        extole?.getLogger().debug(message as String)
+    }
+
+    @objc(info:withResolver:withRejecter:)
+    func info(message: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        extole?.getLogger().info(message as String)
+    }
+
+    @objc(warn:withResolver:withRejecter:)
+    func warn(message: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        extole?.getLogger().warn(message as String)
+    }
+
+    @objc(error:withResolver:withRejecter:)
+    func error(message: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        extole?.getLogger().error(message as String)
+    }
+
     @objc(getJsonConfiguration:withRejecter:)
     func getJsonConfiguration(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         resolve(extole?.getJsonConfiguration())
