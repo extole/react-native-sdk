@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Button, Image, StyleSheet, View } from 'react-native';
+import type { Zone } from '../../src/index';
 import { Extole } from '../../src/index';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -27,18 +28,19 @@ function ExtoleScreen() {
 }
 
 function HomeScreen({ navigation }: { navigation: any }) {
-  const [cta, setCta] = React.useState<Record<string, any> | undefined>();
   const [extoleView, setExtoleView] = React.useState<Element>(<View />);
+  const [zone, setZone] = React.useState<Zone | null>(null);
   extole.configure(extoleView, setExtoleView, () => {
     console.debug('Navigate');
     navigation.navigate('Promo');
   });
   React.useEffect(() => {
     extole
-      .fetchZone('cta_prefetch')
-      .then((result: Record<string, any>) => {
-        extole.getLogger().info('ReactNative Fetched CTA');
-        setCta(result.zone.data);
+      .fetchZone('mobile_cta')
+      .then(([zone, campaign]) => {
+        extole.getLogger()
+          .info('ReactNative Fetched CTA, campaignId:' + campaign.getCampaignId());
+        setZone(zone);
       })
       .catch((error: Error) => {
         extole.getLogger().error(
@@ -46,20 +48,23 @@ function HomeScreen({ navigation }: { navigation: any }) {
       });
   }, []);
 
+  React.useEffect(() => {
+    zone?.viewed()
+  }, [zone]);
 
-  const onShareButtonPress = () => {
-    extole.sendEvent(cta?.touch_event, { extole_zone_name: 'microsite' });
+  const onCtaButtonPress = () => {
+    zone?.tap();
   };
   return (
     <View style={styles.container}>
       <Image
         style={styles.tinyLogo}
         source={{
-          uri: cta?.image || 'https://reactnative.dev/img/tiny_logo.png',
+          uri: zone?.getData().image || 'https://reactnative.dev/img/tiny_logo.png',
         }}
       />
       <View style={styles.space} />
-      <Button title={cta?.title || ''} onPress={onShareButtonPress} />
+      <Button title={zone?.getData().title || ''} onPress={onCtaButtonPress} />
       <View style={styles.space} />
     </View>
   );

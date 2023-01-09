@@ -1,16 +1,17 @@
-import type { FetchResult } from './impl/FetchResult';
 import type { Condition } from './Condition';
 import type { Action } from './Action';
 import type { LogLevel } from './LogLevel';
 import type { Logger } from './Logger';
+import type { Zone } from './Zone';
+import type { Campaign } from './Campaign';
 
 export interface Extole {
   getProgramDomain: () => string;
 
   fetchZone: (
     zoneName: string,
-    data: Record<string, string>
-  ) => Promise<FetchResult>;
+    data: Record<string, string>,
+  ) => Promise<[Zone, Campaign]>;
 
   identify: (email: string, params: Record<string, string>) => string;
 
@@ -18,7 +19,7 @@ export interface Extole {
 
   setLogLevel: (logLevel: LogLevel) => void;
 
-  getLogger(): Logger
+  getLogger(): Logger;
 
   registerCondition: (title: string, condition: Condition) => void;
 

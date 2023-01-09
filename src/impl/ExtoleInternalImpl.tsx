@@ -1,6 +1,5 @@
-import { FetchResult } from './FetchResult';
-import { Zone } from './Zone';
-import { Campaign } from './Campaign';
+import type { Zone } from '../Zone';
+import type { Campaign } from '../Campaign';
 import { View } from 'react-native';
 import type { Condition } from '../Condition';
 import type { Action } from '../Action';
@@ -12,6 +11,8 @@ import { ExtoleNative } from './ExtoleNative';
 import { LogLevel } from '../LogLevel';
 import type { Logger } from 'src/Logger';
 import { LoggerImpl } from './LoggerImpl';
+import { ZoneImpl } from './ZoneImpl';
+import { CampaignImpl } from './CampaignImpl';
 
 
 export class ExtoleInternalImpl implements ExtoleInternal {
@@ -68,13 +69,15 @@ export class ExtoleInternalImpl implements ExtoleInternal {
   public fetchZone = (
     zoneName: string,
     data: Record<string, string> = {},
-  ): Promise<FetchResult> => {
+  ): Promise<[Zone, Campaign]> => {
     return this.extoleNative.fetchZone(zoneName, data).then((result: string) => {
       const resultData = this.toJson(result);
-      return new FetchResult(
-        new Zone(zoneName, resultData),
-        new Campaign(this, resultData.campaign_id, resultData.program_label),
-      );
+      const campaign = new CampaignImpl(this, resultData.campaign_id,
+        resultData.program_label);
+      return [
+        new ZoneImpl(campaign, zoneName, resultData),
+        campaign,
+      ];
     });
   };
 
