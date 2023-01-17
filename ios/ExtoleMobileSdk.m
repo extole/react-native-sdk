@@ -35,6 +35,9 @@ RCT_EXTERN_METHOD(error:(NSString *)message
         withResolver:(RCTPromiseResolveBlock)resolve
         withRejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(logout:(RCTPromiseResolveBlock)resolve
+        withRejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(getJsonConfiguration:(RCTPromiseResolveBlock)resolve
         withRejecter:(RCTPromiseRejectBlock)reject)
 

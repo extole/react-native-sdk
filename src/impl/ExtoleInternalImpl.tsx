@@ -104,12 +104,12 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     this.customActions[title] = action;
   };
 
-  getLogLevel(): LogLevel {
+  public getLogLevel(): LogLevel {
     return this.logLevel;
   }
 
-  setLogLevel(logLevel: LogLevel) {
-    this.logLevel = logLevel;
+  public logout(): void {
+    this.extoleNative.logout()
   }
 
   private evaluateOperations = (event: AppEvent) => {

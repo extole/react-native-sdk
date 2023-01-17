@@ -37,14 +37,8 @@ function HomeScreen({ navigation }: { navigation: any }) {
   React.useEffect(() => {
     extole
       .fetchZone('mobile_cta')
-      .then(([zone, campaign]) => {
-        extole.getLogger()
-          .info('ReactNative Fetched CTA, campaignId:' + campaign.getCampaignId());
+      .then(([zone, _campaign]) => {
         setZone(zone);
-      })
-      .catch((error: Error) => {
-        extole.getLogger().error(
-          'There has been a problem with your fetch operation: ' + error);
       });
   }, []);
 

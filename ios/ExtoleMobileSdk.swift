@@ -14,7 +14,9 @@ class ExtoleMobileSdk: NSObject {
         let email:String? = params.value(forKey: "email") as! String?
         let appData:[String:String] = params.value(forKey: "appData") as! [String: String]? ?? [:]
         let data:[String:String] = params.value(forKey: "data") as! [String: String]? ?? [:]
-        extole = ExtoleImpl(programDomain: "https://" + (programDomain as String), applicationName: appName, personIdentifier: email, applicationData: appData, data: data, labels: labels, sandbox: sandbox, listenToEvents: false)
+        extole = ExtoleImpl(programDomain: "https://" + (programDomain as String), applicationName: appName,
+          personIdentifier: email, applicationData: appData, data: data, labels: labels, sandbox: sandbox,
+          listenToEvents: true, disabledActions: [ActionType.PROMPT, ActionType.VIEW_FULLSCREEN])
     }
 
     @objc(sendEvent:withData:withResolver:withRejecter:)
@@ -63,6 +65,11 @@ class ExtoleMobileSdk: NSObject {
     @objc(error:withResolver:withRejecter:)
     func error(message: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         extole?.getLogger().error(message as String)
+    }
+
+    @objc(logout:withRejecter:)
+    func logout(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        extole?.logout()
     }
 
     @objc(getJsonConfiguration:withRejecter:)

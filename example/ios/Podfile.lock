@@ -4,12 +4,12 @@ PODS:
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
   - extole-mobile-sdk (0.0.1):
-    - ExtoleMobileSDK (~> 0.0.31)
+    - ExtoleMobileSDK (~> 0.0.38)
     - React-Core
   - ExtoleConsumerAPI (0.0.17):
     - Alamofire (~> 5.1.0)
-  - ExtoleMobileSDK (0.0.32):
-    - ExtoleConsumerAPI (~> 0.0.1)
+  - ExtoleMobileSDK (0.0.38):
+    - ExtoleConsumerAPI (~> 0.0.17)
     - Logging (~> 1.4)
     - ObjectMapper (~> 4.1.0)
     - SwiftEventBus (~> 5.0.0)
@@ -568,9 +568,9 @@ SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
-  extole-mobile-sdk: 3ca0bfdf601eb167a8d824906ab56023baf4c49d
+  extole-mobile-sdk: 3e6f3b806b6567c3b2bddd651a2b899f2346e66a
   ExtoleConsumerAPI: 4e512cfee398d5fba446ca04076ee382cbf0979b
-  ExtoleMobileSDK: ff09ee977e40508dfee8c9e10e40cdc881d2ba2d
+  ExtoleMobileSDK: 010d3dc74a1f451c704ab309037b9e3c21dd1b37
   FBLazyVector: a7a655862f6b09625d11c772296b01cd5164b648
   FBReactNativeSpec: 81ce99032d5b586fddd6a38d450f8595f7e04be4
   Flipper: 26fc4b7382499f1281eb8cb921e5c3ad6de91fe0

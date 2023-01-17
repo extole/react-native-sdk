@@ -4,6 +4,7 @@ import { LogLevel } from '../LogLevel';
 import { ExtoleInternalImpl } from '../impl/ExtoleInternalImpl';
 import type { Extole } from '../Extole';
 
+let logLevel = LogLevel.ERROR
 test('custom action and conditions work with map', async () => {
   const extole = new ExtoleInternalImpl('https://mobile-monitor.extole.io',
     'react-native-test',
@@ -19,11 +20,11 @@ test('custom action and conditions work with map', async () => {
 
   expect(extole.customActions['REACT_ACTION']).toBeDefined();
   expect(extole.customConditions['REACT_CONDITION']).toBeDefined();
-  expect(extole.getLogLevel()).toEqual(LogLevel.ERROR);
+  expect(logLevel).toEqual(LogLevel.ERROR);
 
   await extole.sendEvent('name', {});
 
-  expect(extole.getLogLevel()).toEqual(LogLevel.DEBUG);
+  expect(logLevel).toEqual(LogLevel.DEBUG);
 });
 
 class MockNativeLayer extends ExtoleNative {
@@ -83,7 +84,7 @@ class CustomReactAction implements Action {
 
   execute(_event: AppEvent, _extole: Extole) {
     console.log('Custom Action was executed', this);
-    _extole.setLogLevel(LogLevel.DEBUG);
+    logLevel = LogLevel.DEBUG
   }
 }
 

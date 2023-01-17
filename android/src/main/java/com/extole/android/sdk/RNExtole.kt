@@ -104,13 +104,18 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     }
 
     @ReactMethod
+    fun logout() {
+       extole.logout()
+    }
+
+    @ReactMethod
     fun fetchZone(zoneName: String, data: ReadableMap, promise: Promise) {
         executeWithPromise(promise) {
             val response = extole.fetchZone(zoneName,
                 data.toHashMap().mapValues { it.toString() });
             val campaignId = response.second.getId().id
             val programLabel = response.second.getProgramLabel()
-            val content = response.first.content ?: emptyMap()
+            val content = response.first?.content ?: emptyMap()
             val allContent = mutableMapOf<String, Any?>()
             allContent.putAll(content)
             allContent.put("program_label", programLabel)

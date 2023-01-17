@@ -63,6 +63,10 @@ export class ExtoleNative {
     return ExtoleMobileSdk.sendEvent(eventName, params);
   }
 
+  public logout() {
+    return ExtoleMobileSdk.logout()
+  }
+
   public getJsonConfiguration(): Promise<string | Record<string, string>> {
     return ExtoleMobileSdk.getJsonConfiguration();
   }
