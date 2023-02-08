@@ -24,7 +24,8 @@ export default function App() {
 }
 
 function ExtoleScreen() {
-  return <View>extole.view</View>;
+  console.log(extole.view);
+  return extole.view;
 }
 
 function HomeScreen({ navigation }: { navigation: any }) {
@@ -43,11 +44,11 @@ function HomeScreen({ navigation }: { navigation: any }) {
   }, []);
 
   React.useEffect(() => {
-    zone?.viewed()
+    zone?.viewed();
   }, [zone]);
 
   const onCtaButtonPress = () => {
-    zone?.tap();
+    extole.sendEvent('deeplink', { 'extole_item': 'value', 'email': 'email@mailosaur.com' });
   };
   return (
     <View style={styles.container}>

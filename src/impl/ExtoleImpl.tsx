@@ -14,6 +14,7 @@ export class ExtoleImpl extends ExtoleInternalImpl {
     appData: Record<string, string> = {},
     appHeaders: Record<string, string> = {}) {
     super(programDomain, appName, sandbox, labels, data, appData, appHeaders);
+    this.registerDefaultActions()
   }
 
   protected registerDefaultActions() {
