@@ -48,7 +48,6 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.18.2",
     "@react-native-community/eslint-config": "^3.0.2",
-    "@tsconfig/react-native": "^2.0.3",
     "@types/jest": "^28.1.2",
     "@types/react": "~17.0.21",
     "@types/react-native": "0.68.0",

@@ -1760,11 +1760,6 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@tsconfig/react-native@^2.0.3":
-  "integrity" "sha512-jE58snEKBd9DXfyR4+ssZmYJ/W2mOSnNrvljR0aLyQJL9JKX6vlWELHkRjb3HBbcM9Uy0hZGijXbqEAjOERW2A=="
-  "resolved" "https://registry.npmjs.org/@tsconfig/react-native/-/react-native-2.0.3.tgz"
-  "version" "2.0.3"
-
 "@types/babel__core@^7.1.14":
   "integrity" "sha512-PVb6Bg2QuscZ30FvOU7z4guG6c926D9YRvOxEaelzndpMsvP+YM74Q/dAFASpg2l6+XLalxSGxcq/lrgYWZtyQ=="
   "resolved" "https://registry.npmjs.org/@types/babel__core/-/babel__core-7.1.20.tgz"
