@@ -1,5 +1,5 @@
 import { ExtoleNative } from '../impl/ExtoleNative';
-import type { Action, AppEvent, Condition } from 'extole-mobile-sdk';
+import type { Action, AppEvent, Condition } from '../';
 import { LogLevel } from '../LogLevel';
 import { ExtoleInternalImpl } from '../impl/ExtoleInternalImpl';
 import type { Extole } from '../Extole';
