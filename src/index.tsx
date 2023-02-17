@@ -6,4 +6,6 @@ import type { Operation } from './impl/Operation';
 import type { Zone } from './Zone';
 import type { Campaign } from './Campaign';
 
-export { Condition, Action, AppEvent, Operation, Zone, Campaign, ExtoleImpl as Extole };
+export type { Condition, Action, AppEvent, Operation, Zone, Campaign };
+
+export { ExtoleImpl as Extole };

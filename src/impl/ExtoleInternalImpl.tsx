@@ -19,16 +19,16 @@ export class ExtoleInternalImpl implements ExtoleInternal {
   programDomain: string;
   customConditions: Record<string, Partial<Condition>> = {};
   customActions: Record<string, Partial<Action>> = {};
-  extoleView: Element = (<View></View>);
+  extoleView: React.ReactNode = (<View></View>);
   logLevel: LogLevel = LogLevel.ERROR;
   navigationCallback: () => void = () => {
     // no default behavior
   };
-  viewHandler: (value: ((prevState: Element) => Element) | Element) => void =
+  viewHandler: (value: ((previousState: React.ReactNode) => React.ReactNode) | React.ReactNode) => void =
     () => {
       // no default behavior
     };
-  view: Element = new Component({});
+  view: React.ReactNode = new Component({});
   extoleNative: ExtoleNative;
 
 
@@ -82,8 +82,8 @@ export class ExtoleInternalImpl implements ExtoleInternal {
   };
 
   public configure(
-    extoleView: Element,
-    setExtoleView: (value: ((prevState: Element) => Element) | Element) => void,
+    extoleView: React.ReactNode,
+    setExtoleView: (value: ((prevState: React.ReactNode) => React.ReactNode) | React.ReactNode) => void,
     navigationCallback: () => void,
   ) {
     this.view = extoleView;
@@ -109,7 +109,7 @@ export class ExtoleInternalImpl implements ExtoleInternal {
   }
 
   public logout(): void {
-    this.extoleNative.logout()
+    this.extoleNative.logout();
   }
 
   private evaluateOperations = (event: AppEvent) => {

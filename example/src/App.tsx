@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import * as React from 'react';
 
 import { Button, Image, StyleSheet, View } from 'react-native';
@@ -23,13 +24,12 @@ export default function App() {
   );
 }
 
-function ExtoleScreen() {
-  console.log(extole.view);
-  return extole.view;
+function ExtoleScreen(): ReactElement {
+  return extole.view as ReactElement;
 }
 
 function HomeScreen({ navigation }: { navigation: any }) {
-  const [extoleView, setExtoleView] = React.useState<Element>(<View />);
+  const [extoleView, setExtoleView] = React.useState<React.ReactNode>(<View />);
   const [zone, setZone] = React.useState<Zone | null>(null);
   extole.configure(extoleView, setExtoleView, () => {
     console.debug('Navigate');
@@ -42,10 +42,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
         setZone(zone);
       });
   }, []);
-
-  React.useEffect(() => {
-    zone?.viewed();
-  }, [zone]);
 
   const onCtaButtonPress = () => {
     extole.sendEvent('deeplink', { 'extole_item': 'value', 'email': 'email@mailosaur.com' });
