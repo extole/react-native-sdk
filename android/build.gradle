@@ -74,14 +74,6 @@ android {
 
 repositories {
   mavenCentral()
-  maven {
-    name "github"
-    url "https://maven.pkg.github.com/extole/android-sdk"
-    credentials {
-      username = System.getenv('GITHUB_USER')
-      password = System.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')
-    }
-  }
   google()
 
   def found = false
@@ -156,7 +148,7 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.extole.mobile:android-sdk:1.0.31'
+  implementation 'com.extole.mobile:android-sdk:1.0.39'
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
   // From node_modules
 }
