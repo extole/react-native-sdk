@@ -74,10 +74,8 @@ export class ExtoleInternalImpl implements ExtoleInternal {
       const resultData = this.toJson(result);
       const campaign = new CampaignImpl(this, resultData.campaign_id,
         resultData.program_label);
-      return [
-        new ZoneImpl(campaign, zoneName, resultData),
-        campaign,
-      ];
+      return [new ZoneImpl(campaign, zoneName,
+        this.toJson(resultData.zone)), campaign];
     });
   };
 

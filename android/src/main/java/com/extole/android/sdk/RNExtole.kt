@@ -115,12 +115,12 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                 data.toHashMap().mapValues { it.toString() });
             val campaignId = response.second.getId().id
             val programLabel = response.second.getProgramLabel()
-            val content = response.first?.content ?: emptyMap()
+            val zoneContent = response.first?.content ?: emptyMap()
             val allContent = mutableMapOf<String, Any?>()
-            allContent.putAll(content)
+            allContent.put("zone", zoneContent)
             allContent.put("program_label", programLabel)
             allContent.put("campaign_id", campaignId)
-            return@executeWithPromise convertJsonToMap(JSONObject(content))
+            return@executeWithPromise convertJsonToMap(JSONObject(allContent))
         }
     }
 
