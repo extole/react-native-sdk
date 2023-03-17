@@ -25,7 +25,7 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     ReactContextBaseJavaModule(reactContext) {
 
     @Volatile
-    private lateinit var extole: ExtoleInternal
+    private var extole: ExtoleInternal? = null
 
     @ReactMethod
     fun init(
@@ -46,30 +46,34 @@ class RNExtole(reactContext: ReactApplicationContext?) :
         val email: String? = parameters.getString("email")
         val listenToEvents: Boolean =
             if (parameters.hasKey("listenToEvents")) parameters.getBoolean("listenToEvents") else true
-        if (!this::extole.isInitialized) {
+        if (extole == null) {
             synchronized(this) {
                 val additionaProtocolHandler = listOf<ProtocolHandler>()
 
-                if (!this::extole.isInitialized) {
-                    Log.d("Extole", "Extole React initialized")
-                    extole = ExtoleImpl(
-                        programDomain,
-                        appName,
-                        sandbox,
-                        ApplicationContext(reactApplicationContext.baseContext, null),
-                        labelsSet,
-                        dataMap,
-                        appDataMap.toMutableMap(),
-                        appHeadersMap.toMutableMap(),
-                        email,
-                        listenToEvents,
-                        additionaProtocolHandler,
-                        null,
-                        disabledActions = setOf(
-                            Action.ActionType.VIEW_FULLSCREEN,
-                            Action.ActionType.PROMPT
+                if (extole == null) {
+                    try {
+                        Log.d("Extole", "Extole React initialized")
+                        extole = ExtoleImpl(
+                            programDomain,
+                            appName,
+                            sandbox,
+                            ApplicationContext(reactApplicationContext.baseContext, null),
+                            labelsSet,
+                            dataMap,
+                            appDataMap.toMutableMap(),
+                            appHeadersMap.toMutableMap(),
+                            email,
+                            listenToEvents,
+                            additionaProtocolHandler,
+                            null,
+                            disabledActions = setOf(
+                                Action.ActionType.VIEW_FULLSCREEN,
+                                Action.ActionType.PROMPT
+                            )
                         )
-                    )
+                    } catch (exception: Exception) {
+                        Log.e("Extole", "Unable to initialize Extole", exception)
+                    }
                 }
             }
         }
@@ -78,63 +82,72 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun sendEvent(eventName: String, data: ReadableMap, promise: Promise) {
         executeWithPromise(promise) {
-            return@executeWithPromise extole.sendEvent(eventName,
-                data.toHashMap().mapValues { it.toString() }).id
+            if (extole != null) {
+                return@executeWithPromise extole?.sendEvent(eventName,
+                    data.toHashMap().mapValues { it.toString() })?.id
+            }
+            throw Exception("Extole is not initialized")
         }
     }
 
     @ReactMethod
     fun debug(message: String) {
-        return extole.getLogger().debug(message)
+        extole?.getLogger()?.debug(message)
     }
 
     @ReactMethod
     fun info(message: String) {
-        return extole.getLogger().info(message)
+        extole?.getLogger()?.info(message)
     }
 
     @ReactMethod
     fun warn(message: String) {
-        return extole.getLogger().warn(message)
+        extole?.getLogger()?.warn(message)
     }
 
     @ReactMethod
     fun error(message: String) {
-        return extole.getLogger().error(message)
+        extole?.getLogger()?.error(message)
     }
 
     @ReactMethod
     fun logout() {
-       extole.logout()
+        extole?.logout()
     }
 
     @ReactMethod
     fun fetchZone(zoneName: String, data: ReadableMap, promise: Promise) {
         executeWithPromise(promise) {
-            val response = extole.fetchZone(zoneName,
-                data.toHashMap().mapValues { it.toString() });
-            val campaignId = response.second.getId().id
-            val programLabel = response.second.getProgramLabel()
-            val zoneContent = response.first?.content ?: emptyMap()
-            val allContent = mutableMapOf<String, Any?>()
-            allContent.put("zone", zoneContent)
-            allContent.put("program_label", programLabel)
-            allContent.put("campaign_id", campaignId)
-            return@executeWithPromise convertJsonToMap(JSONObject(allContent))
+            if (extole != null) {
+                val response = extole?.fetchZone(zoneName,
+                    data.toHashMap().mapValues { it.toString() });
+                val campaignId = response?.second?.getId()?.id
+                val programLabel = response?.second?.getProgramLabel()
+                val zoneContent = response?.first?.content ?: emptyMap()
+                val allContent = mutableMapOf<String, Any?>()
+                allContent.put("zone", zoneContent)
+                allContent.put("program_label", programLabel)
+                allContent.put("campaign_id", campaignId)
+                return@executeWithPromise convertJsonToMap(JSONObject(allContent))
+            }
+            throw Exception("Extole is not initialized")
         }
     }
 
     @ReactMethod
     fun identify(email: String, data: ReadableMap, promise: Promise) {
         executeWithPromise(promise) {
-            return@executeWithPromise extole.identify(
-                email, data.toHashMap().mapValues { it.toString() }).id
+            if (extole != null) {
+                return@executeWithPromise extole?.identify(
+                    email, data.toHashMap().mapValues { it.toString() })?.id
+            }
+            throw Exception("Extole is not initialized")
         }
     }
 
     @ReactMethod
     fun getJsonConfiguration(promise: Promise) {
-        promise.resolve(JSONArray(extole.getJsonConfiguration()).toString())
+        promise.resolve(JSONArray(extole?.getJsonConfiguration()).toString())
     }
 
     @Suppress("TooGenericExceptionCaught")
@@ -145,9 +158,9 @@ class RNExtole(reactContext: ReactApplicationContext?) :
         GlobalScope.launch {
             try {
                 promise.resolve(closure())
-            } catch (e: RuntimeException) {
+            } catch (e: Exception) {
                 Log.e("Extole", "Exception " + e.stackTraceToString())
-                promise.reject("failed to send event", e)
+                promise.reject("Extole execution failed", e)
             }
         }
     }
@@ -215,7 +228,10 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                     ReadableType.Boolean -> jsonObject.put(key, readableMap.getBoolean(key))
                     ReadableType.Number -> jsonObject.put(key, readableMap.getDouble(key))
                     ReadableType.String -> jsonObject.put(key, readableMap.getString(key))
-                    ReadableType.Map -> jsonObject.put(key, convertMapToJson(readableMap.getMap(key)))
+                    ReadableType.Map -> jsonObject.put(
+                        key,
+                        convertMapToJson(readableMap.getMap(key))
+                    )
                     ReadableType.Array -> jsonObject.put(
                         key,
                         convertArrayToJson(readableMap.getArray(key))

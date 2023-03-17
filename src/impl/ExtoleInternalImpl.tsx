@@ -41,7 +41,6 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     appData: Record<string, string> = {},
     appHeaders: Record<string, string> = {},
     extoleNative: ExtoleNative = new ExtoleNative()) {
-    console.trace('extole init');
     this.extoleNative = extoleNative;
     extoleNative.init(programDomain, appName, sandbox, labels, data, appData, appHeaders);
     this.customConditions = {};

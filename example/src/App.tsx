@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import * as React from 'react';
 
-import { Button, Image, StyleSheet, View } from 'react-native';
+import { Button, Image, StyleSheet, Text, View } from 'react-native';
 import type { Zone } from '../../src/index';
 import { Extole } from '../../src/index';
 import { NavigationContainer } from '@react-navigation/native';
@@ -40,7 +40,9 @@ function HomeScreen({ navigation }: { navigation: any }) {
       .fetchZone('mobile_cta')
       .then(([zone, _campaign]) => {
         setZone(zone);
-      });
+      }).catch((exception: any) => {
+      console.log('Unable to fetch zone', exception);
+    });
   }, []);
 
   const onCtaButtonPress = () => {
@@ -55,6 +57,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
         }}
       />
       <View style={styles.space} />
+      <Text>This is a Demo App that may not contain content if there is no internet connection</Text>
       <Button title={zone?.getData().title || ''} onPress={onCtaButtonPress} />
       <View style={styles.space} />
     </View>
