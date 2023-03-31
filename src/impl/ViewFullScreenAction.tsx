@@ -1,8 +1,8 @@
-import WebView from 'react-native-webview';
+import WebView, { WebViewMessageEvent } from 'react-native-webview';
 import type { Action } from '../Action';
 import type { AppEvent } from './AppEvent';
 import type { ExtoleInternal } from './ExtoleInternal';
-import { Dimensions } from 'react-native';
+import { Dimensions, Share } from 'react-native';
 import React from 'react';
 
 
@@ -33,6 +33,33 @@ export class ViewFullScreenAction implements Action {
           width: Dimensions.get('window').width,
           height: Dimensions.get('window').height,
         }}
+        injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
+        onMessage={async (event: WebViewMessageEvent) => {
+          const { data } = event.nativeEvent;
+          if (data.startsWith('share:')) {
+            try {
+              const param: WebShareAPIParam = JSON.parse(JSON.parse(data.slice('share:'.length)));
+              if (param.url == null && param.text == null) {
+                console.log('Return');
+                return;
+              }
+
+              await Share.share(
+                {
+                  title: param.title,
+                  message: [param.text, param.url].filter(Boolean).join(' '),
+                  url: param.url,
+                },
+                {
+                  dialogTitle: param.title,
+                  subject: param.title,
+                },
+              );
+            } catch (e: unknown) {
+              console.error('WebView error', e);
+            }
+          }
+        }}
         source={{
           uri: zoneUrl.href,
         }}
@@ -40,4 +67,24 @@ export class ViewFullScreenAction implements Action {
     );
     extole.navigationCallback();
   }
+}
+
+const injectedJavaScriptBeforeContentLoaded = `
+      if (navigator.share == null) {
+        navigator.share = (param) => {
+           window.ReactNativeWebView.postMessage('share:' + JSON.stringify(param));
+        };
+      };
+      if (window.extoleShare === undefined) {
+        window.extoleShare = {}
+        window.extoleShare.share = (param) => {
+           window.ReactNativeWebView.postMessage('share:' + JSON.stringify(param));
+        };
+      };
+      true;`;
+
+interface WebShareAPIParam {
+  url?: string;
+  text?: string;
+  title?: string;
 }

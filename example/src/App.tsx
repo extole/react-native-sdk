@@ -32,7 +32,6 @@ function HomeScreen({ navigation }: { navigation: any }) {
   const [extoleView, setExtoleView] = React.useState<React.ReactNode>(<View />);
   const [zone, setZone] = React.useState<Zone | null>(null);
   extole.configure(extoleView, setExtoleView, () => {
-    console.debug('Navigate');
     navigation.navigate('Promo');
   });
   React.useEffect(() => {
