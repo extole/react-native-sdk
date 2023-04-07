@@ -8,6 +8,5 @@ export class PromptAction implements Action {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute(_event: AppEvent, _extole: ExtoleInternal) {
-    console.trace('Prompt Action was executed', this);
   }
 }

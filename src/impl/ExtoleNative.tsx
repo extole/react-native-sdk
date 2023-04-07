@@ -67,6 +67,10 @@ export class ExtoleNative {
     return ExtoleMobileSdk.sendEvent(eventName, params);
   }
 
+  public identify(email: string, params: Record<string, string>) {
+    return ExtoleMobileSdk.identify(email, params);
+  }
+
   public logout() {
     return ExtoleMobileSdk.logout();
   }

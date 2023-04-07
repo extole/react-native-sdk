@@ -14,7 +14,6 @@ export class ViewFullScreenAction implements Action {
   data: Record<string, string> = {};
 
   execute(event: AppEvent, extole: ExtoleInternal) {
-    console.trace('ViewFullScreen was executed');
     const zoneUrl = new URL(
       'https://' + extole.getProgramDomain() + '/zone/' + this.zone_name,
     );
@@ -40,7 +39,6 @@ export class ViewFullScreenAction implements Action {
             try {
               const param: WebShareAPIParam = JSON.parse(JSON.parse(data.slice('share:'.length)));
               if (param.url == null && param.text == null) {
-                console.log('Return');
                 return;
               }
 
@@ -55,8 +53,8 @@ export class ViewFullScreenAction implements Action {
                   subject: param.title,
                 },
               );
-            } catch (e: unknown) {
-              console.error('WebView error', e);
+            } catch (error: unknown) {
+              console.error('WebView error', error);
             }
           }
         }}

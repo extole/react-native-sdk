@@ -53,8 +53,7 @@ export class ExtoleInternalImpl implements ExtoleInternal {
   }
 
   public identify(email: string, params: Record<string, string>): string {
-    params['email'] = email;
-    return this.sendEvent('identify', params);
+    return this.extoleNative.identify(email, params);
   }
 
   public getProgramDomain(): string {
@@ -118,7 +117,6 @@ export class ExtoleInternalImpl implements ExtoleInternal {
           .filter(this.filterPassingConditions(event))
           .flatMap((operation) => operation.actions);
 
-        console.trace('Actions to Execute', actionsToExecute);
         this.executeActions(actionsToExecute, event);
       },
     );
@@ -128,7 +126,6 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     return (operation: Operation) => {
       return (
         operation.conditions.filter((condition: Condition) => {
-          console.trace('Checking: ', condition);
           return (
             condition.type in this.customConditions ||
             condition.title in this.customConditions

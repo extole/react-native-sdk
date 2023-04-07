@@ -36,12 +36,14 @@ class RNExtole(reactContext: ReactApplicationContext?) :
             parameters.getArray("labels")?.toArrayList()?.map { it.toString() }?.toSet()
                 ?: emptySet()
         val appHeadersMap: Map<String, String> =
-            parameters.getMap("appHeaders")?.toHashMap()?.mapValues { it.toString() } ?: emptyMap()
+            parameters.getMap("appHeaders")?.toHashMap()?.mapValues { it.value.toString() }
+                ?: emptyMap()
         val appDataMap: Map<String, String> =
-            parameters.getMap("appData")?.toHashMap()?.mapValues { it.toString() } ?: emptyMap()
+            parameters.getMap("appData")?.toHashMap()?.mapValues { it.value.toString() }
+                ?: emptyMap()
         val dataMap: Map<String, String> =
-            parameters.getMap("data")?.toHashMap()?.mapValues { it.toString() } ?: emptyMap()
-        val sandbox: String = parameters.getString("sandobx") ?: "prod-prod"
+            parameters.getMap("data")?.toHashMap()?.mapValues { it.value.toString() } ?: emptyMap()
+        val sandbox: String = parameters.getString("sandobx") ?: "production-production"
         val appName: String = parameters.getString("appName") ?: "Extole $programDomain"
         val email: String? = parameters.getString("email")
         val listenToEvents: Boolean =
@@ -83,8 +85,10 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     fun sendEvent(eventName: String, data: ReadableMap, promise: Promise) {
         executeWithPromise(promise) {
             if (extole != null) {
-                return@executeWithPromise extole?.sendEvent(eventName,
-                    data.toHashMap().mapValues { it.toString() })?.id
+                val eventData =
+                    (recursivelyDeconstructReadableMap(data)?.mapValues { it.value.toString() }
+                        ?: emptyMap())
+                return@executeWithPromise extole?.sendEvent(eventName, eventData)?.id
             }
             throw Exception("Extole is not initialized")
         }
@@ -119,8 +123,10 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     fun fetchZone(zoneName: String, data: ReadableMap, promise: Promise) {
         executeWithPromise(promise) {
             if (extole != null) {
-                val response = extole?.fetchZone(zoneName,
-                    data.toHashMap().mapValues { it.toString() });
+                val response = extole?.fetchZone(
+                    zoneName,
+                    recursivelyDeconstructReadableMap(data) ?: emptyMap()
+                );
                 val campaignId = response?.second?.getId()?.id
                 val programLabel = response?.second?.getProgramLabel()
                 val zoneContent = response?.first?.content ?: emptyMap()
@@ -138,8 +144,14 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     fun identify(email: String, data: ReadableMap, promise: Promise) {
         executeWithPromise(promise) {
             if (extole != null) {
+                val identifyData =
+                    (recursivelyDeconstructReadableMap(data)?.mapValues { it.value.toString() }
+                        ?: emptyMap())
+                Log.e("Extole", "Identify executed 2 :" + identifyData)
                 return@executeWithPromise extole?.identify(
-                    email, data.toHashMap().mapValues { it.toString() })?.id
+                    email,
+                    identifyData
+                )?.id
             }
             throw Exception("Extole is not initialized")
         }
@@ -170,6 +182,57 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     }
 
     companion object {
+
+        private fun recursivelyDeconstructReadableMap(readableMap: ReadableMap?): Map<String, Any?>? {
+            val iterator = readableMap!!.keySetIterator()
+            val deconstructedMap: MutableMap<String, Any?> = HashMap()
+            while (iterator.hasNextKey()) {
+                val key = iterator.nextKey()
+                val type = readableMap.getType(key)
+                when (type) {
+                    ReadableType.Null -> deconstructedMap[key] = null
+                    ReadableType.Boolean -> deconstructedMap[key] = readableMap.getBoolean(key)
+                    ReadableType.Number -> deconstructedMap[key] = readableMap.getDouble(key)
+                    ReadableType.String -> deconstructedMap[key] = readableMap.getString(key)
+                    ReadableType.Map -> deconstructedMap[key] = recursivelyDeconstructReadableMap(
+                        readableMap.getMap(key)
+                    )
+                    ReadableType.Array -> deconstructedMap[key] =
+                        recursivelyDeconstructReadableArray(
+                            readableMap.getArray(key)
+                        )
+                    else -> throw IllegalArgumentException("Could not convert object with key: $key.")
+                }
+            }
+            return deconstructedMap
+        }
+
+        private fun recursivelyDeconstructReadableArray(readableArray: ReadableArray?): List<Any?>? {
+            if (readableArray == null) {
+                return emptyList()
+            }
+            val deconstructedList: MutableList<Any?> = mutableListOf()
+            for (i in 0 until readableArray.size()) {
+                val indexType = readableArray.getType(i)
+                when (indexType) {
+                    ReadableType.Null -> deconstructedList.add(i, null)
+                    ReadableType.Boolean -> deconstructedList.add(i, readableArray.getBoolean(i))
+                    ReadableType.Number -> deconstructedList.add(i, readableArray.getDouble(i))
+                    ReadableType.String -> deconstructedList.add(i, readableArray.getString(i))
+                    ReadableType.Map -> deconstructedList.add(
+                        i,
+                        recursivelyDeconstructReadableMap(readableArray.getMap(i))
+                    )
+                    ReadableType.Array -> deconstructedList.add(
+                        i,
+                        recursivelyDeconstructReadableArray(readableArray.getArray(i))
+                    )
+                    else -> throw java.lang.IllegalArgumentException("Could not convert object at index $i.")
+                }
+            }
+            return deconstructedList
+        }
+
         fun convertJsonToMap(jsonObject: JSONObject): WritableMap? {
             val map: WritableMap = WritableNativeMap()
             val iterator: Iterator<String> = jsonObject.keys()

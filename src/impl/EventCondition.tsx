@@ -11,7 +11,6 @@ export class EventCondition implements Condition {
   event_names: string[] = [];
 
   test(event: AppEvent, _: ExtoleInternal): boolean {
-    console.trace('Event Condition was executed', event);
     return this.event_names.includes(event.name);
   }
 }
