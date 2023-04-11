@@ -8,5 +8,6 @@ export class PromptAction implements Action {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   execute(_event: AppEvent, _extole: ExtoleInternal) {
+    // not implemented on react native
   }
 }

@@ -2,7 +2,7 @@ import WebView, { WebViewMessageEvent } from 'react-native-webview';
 import type { Action } from '../Action';
 import type { AppEvent } from './AppEvent';
 import type { ExtoleInternal } from './ExtoleInternal';
-import { Dimensions, Share } from 'react-native';
+import { Dimensions, Linking, Share } from 'react-native';
 import React from 'react';
 
 
@@ -33,6 +33,24 @@ export class ViewFullScreenAction implements Action {
           height: Dimensions.get('window').height,
         }}
         injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
+        originWhitelist={['http://*', 'https://*', 'sms:*', 'tel:*', 'mailto:*']}
+        onShouldStartLoadWithRequest={(request) => {
+          if (request.url.startsWith('blob')) {
+            console.error('Link cannot be opened.');
+            return false;
+          }
+
+          if (request.url.startsWith('tel:') ||
+            request.url.startsWith('mailto:') ||
+            request.url.startsWith('sms:')
+          ) {
+            Linking.openURL(request.url).catch(error => {
+              console.error('Failed to open Link: ' + error.message);
+            });
+            return false;
+          }
+          return true;
+        }}
         onMessage={async (event: WebViewMessageEvent) => {
           const { data } = event.nativeEvent;
           if (data.startsWith('share:')) {
