@@ -71,6 +71,9 @@ export class ExtoleNative {
     return ExtoleMobileSdk.identify(email, params);
   }
 
+  public getAccessToken() {
+    return ExtoleMobileSdk.getAccessToken();
+  }
   public logout() {
     return ExtoleMobileSdk.logout();
   }

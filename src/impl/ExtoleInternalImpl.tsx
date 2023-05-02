@@ -104,6 +104,10 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     return this.logLevel;
   }
 
+  public getAccessToken(): string {
+    return  this.extoleNative.getAccessToken();
+  }
+
   public logout(): void {
     this.extoleNative.logout();
   }

@@ -92,4 +92,9 @@ class ExtoleMobileSdk: NSObject {
     func getJsonConfiguration(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         resolve(extole?.getJsonConfiguration())
     }
+
+    @objc(getAccessToken:withRejecter:)
+    func getAccessToken(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+        resolve(extole?.getAccessToken())
+    }
 }

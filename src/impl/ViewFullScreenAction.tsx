@@ -13,10 +13,14 @@ export class ViewFullScreenAction implements Action {
   zone_name = '';
   data: Record<string, string> = {};
 
-  execute(event: AppEvent, extole: ExtoleInternal) {
+  async execute(event: AppEvent, extole: ExtoleInternal) {
     const zoneUrl = new URL(
       'https://' + extole.getProgramDomain() + '/zone/' + this.zone_name,
     );
+    const accessToken = await extole.getAccessToken();
+    const headers = {
+      'Authorization': 'Bearer ' + accessToken,
+    };
     for (const key in event.params) {
       zoneUrl.searchParams.append(
         encodeURIComponent(key),
@@ -78,6 +82,7 @@ export class ViewFullScreenAction implements Action {
         }}
         source={{
           uri: zoneUrl.href,
+          headers: headers,
         }}
       />,
     );

@@ -45,7 +45,7 @@ function HomeScreen({ navigation }: { navigation: any }) {
   }, []);
 
   const onCtaButtonPress = () => {
-    extole.sendEvent('deeplink', { 'extole_item': 'value', 'email': 'email@mailosaur.com' });
+    extole.sendEvent('deeplink', { 'extole_item': 'value' });
   };
   return (
     <View style={styles.container}>

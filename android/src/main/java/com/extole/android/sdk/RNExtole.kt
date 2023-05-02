@@ -162,6 +162,11 @@ class RNExtole(reactContext: ReactApplicationContext?) :
         promise.resolve(JSONArray(extole?.getJsonConfiguration()).toString())
     }
 
+    @ReactMethod
+    fun getAccessToken(promise: Promise) {
+        promise.resolve(extole?.getAccessToken())
+    }
+
     @Suppress("TooGenericExceptionCaught")
     private fun <T> executeWithPromise(
         promise: Promise,

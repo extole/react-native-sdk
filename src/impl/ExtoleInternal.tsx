@@ -5,4 +5,6 @@ export interface ExtoleInternal extends Extole {
   setViewElement: (view: Element) => void;
   navigationCallback: () => void;
   getLogLevel: () => LogLevel;
+
+  getAccessToken: () => string;
 }
