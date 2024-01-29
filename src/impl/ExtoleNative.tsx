@@ -71,6 +71,10 @@ export class ExtoleNative {
     return ExtoleMobileSdk.identify(email, params);
   }
 
+  public identifyJwt(jwt: string, params: Record<string, string>) {
+    return ExtoleMobileSdk.identifyJwt(jwt, params);
+  }
+
   public getAccessToken() {
     return ExtoleMobileSdk.getAccessToken();
   }

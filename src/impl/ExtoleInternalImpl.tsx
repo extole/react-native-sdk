@@ -56,6 +56,9 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     return this.extoleNative.identify(email, params);
   }
 
+  public identifyJwt(jwt: string, params: Record<string, string>): string {
+    return this.extoleNative.identifyJwt(jwt, params);
+  }
   public getProgramDomain(): string {
     return this.programDomain;
   }

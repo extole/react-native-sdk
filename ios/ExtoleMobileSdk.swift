@@ -43,6 +43,18 @@ class ExtoleMobileSdk: NSObject {
         }
     }
 
+    @objc(identifyJwt:withData:withResolver:withRejecter:)
+    func identify(jwt: NSString, data: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        extole?.identifyJwt(jwt as String, (data as! [String: String]?) ?? [:]) { [self] (idEvent, error) in
+            if error != nil {
+                self.extole?.getLogger().error(error?.localizedDescription ?? "Unable to send identify event")
+                reject("identify_failed", error?.localizedDescription ?? "Unable to send identify event", error)
+            } else {
+                resolve(idEvent?.getValue())
+            }
+        }
+    }
+
     @objc(fetchZone:withData:withResolver:withRejecter:)
     func fetchZone(zoneName: NSString, data: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         extole?.fetchZone(zoneName as String, (data as! [String: String]?) ?? [:]) { (zone: Zone?, campaign: Campaign?, error: Error?) in

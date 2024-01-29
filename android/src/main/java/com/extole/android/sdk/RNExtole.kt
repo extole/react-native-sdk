@@ -147,9 +147,24 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                 val identifyData =
                     (recursivelyDeconstructReadableMap(data)?.mapValues { it.value.toString() }
                         ?: emptyMap())
-                Log.e("Extole", "Identify executed 2 :" + identifyData)
                 return@executeWithPromise extole?.identify(
                     email,
+                    identifyData
+                )?.id
+            }
+            throw Exception("Extole is not initialized")
+        }
+    }
+
+    @ReactMethod
+    fun identifyJwt(jwt: String, data: ReadableMap, promise: Promise) {
+        executeWithPromise(promise) {
+            if (extole != null) {
+                val identifyData =
+                    (recursivelyDeconstructReadableMap(data)?.mapValues { it.value.toString() }
+                        ?: emptyMap())
+                return@executeWithPromise extole?.identifyJwt(
+                    jwt,
                     identifyData
                 )?.id
             }

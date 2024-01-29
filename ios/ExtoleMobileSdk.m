@@ -19,6 +19,10 @@ RCT_EXTERN_METHOD(identify:(NSString *)email withData:(NSDictionary *)data
         withResolver:(RCTPromiseResolveBlock)resolve
         withRejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(identifyJwt:(NSString *)jwt withData:(NSDictionary *)data
+        withResolver:(RCTPromiseResolveBlock)resolve
+        withRejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(fetchZone:(NSString *)zoneName withData:(NSDictionary *)data
         withResolver:(RCTPromiseResolveBlock)resolve
         withRejecter:(RCTPromiseRejectBlock)reject)

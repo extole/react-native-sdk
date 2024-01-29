@@ -8,6 +8,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const extole = new Extole('mobile-monitor.extole.io', 'react-native');
+const jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6IjUzNmQwNWE2LTMzZWUtNDI2NC04ODI2LW" +
+  "JhZDRjOTAyMWZhZiJ9.eyJpc3MiOiJtb2JpbGUtc2RrLmV4dG9sZS5jb20iLCJhdWQiOlsiZXh0b2xlLmNvbSJ" +
+  "dLCJlbWFpbCI6InNka3BlcnNvbi1lbWFpbEBtYWlsb3NhdXIuY29tIiwiaWF0IjoxNzA1NTg0Mjg0LCJleHAiO" +
+  "jI0ODMxODQyODR9.XdB5-j58GcEeKqKkCLd5f_G78CLLJIHCmsfcOpH-n3o"
+extole.identifyJwt(jwt, {})
 const Stack = createStackNavigator();
 export default function App() {
   return (
@@ -40,8 +45,13 @@ function HomeScreen({ navigation }: { navigation: any }) {
       .then(([zone, _campaign]) => {
         setZone(zone);
       }).catch((exception: any) => {
-      console.log('Unable to fetch zone', exception);
+      console.error('Unable to fetch zone', exception);
     });
+    extole
+      .fetchZone('mobile_cta_timestamp')
+      .then(([zone, _campaign]) => {
+        console.log("Timestamp zone data", zone.getData())
+      });
   }, []);
 
   const onCtaButtonPress = () => {
