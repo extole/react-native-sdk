@@ -14,9 +14,10 @@ class ExtoleMobileSdk: NSObject {
         let email: String? = params.value(forKey: "email") as! String?
         let appData: [String: String] = params.value(forKey: "appData") as! [String: String]? ?? [:]
         let data: [String: String] = params.value(forKey: "data") as! [String: String]? ?? [:]
+        let jwt: String? = params.value(forKey: "jwt") as! String?
         extole = ExtoleImpl(programDomain: "https://" + (programDomain as String), applicationName: appName,
           personIdentifier: email, applicationData: appData, data: data, labels: labels, sandbox: sandbox,
-          listenToEvents: true, disabledActions: [ActionType.PROMPT, ActionType.VIEW_FULLSCREEN])
+          listenToEvents: true, disabledActions: [ActionType.PROMPT, ActionType.VIEW_FULLSCREEN], jwt: jwt)
     }
 
     @objc(sendEvent:withData:withResolver:withRejecter:)

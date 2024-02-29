@@ -7,12 +7,12 @@ import { Extole } from '../../src/index';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-const extole = new Extole('mobile-monitor.extole.io', 'react-native');
 const jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6IjUzNmQwNWE2LTMzZWUtNDI2NC04ODI2LW" +
   "JhZDRjOTAyMWZhZiJ9.eyJpc3MiOiJtb2JpbGUtc2RrLmV4dG9sZS5jb20iLCJhdWQiOlsiZXh0b2xlLmNvbSJ" +
   "dLCJlbWFpbCI6InNka3BlcnNvbi1lbWFpbEBtYWlsb3NhdXIuY29tIiwiaWF0IjoxNzA1NTg0Mjg0LCJleHAiO" +
   "jI0ODMxODQyODR9.XdB5-j58GcEeKqKkCLd5f_G78CLLJIHCmsfcOpH-n3o"
-extole.identifyJwt(jwt, {})
+const extole = new Extole('mobile-monitor.extole.io', 'react-native', 'production-production', [], {}, {}, {}, undefined, jwt);
+
 const Stack = createStackNavigator();
 export default function App() {
   return (

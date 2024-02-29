@@ -40,9 +40,11 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     data: Record<string, string> = {},
     appData: Record<string, string> = {},
     appHeaders: Record<string, string> = {},
+    email: string | undefined,
+    jwt: string | undefined,
     extoleNative: ExtoleNative = new ExtoleNative()) {
     this.extoleNative = extoleNative;
-    extoleNative.init(programDomain, appName, sandbox, labels, data, appData, appHeaders);
+    extoleNative.init(programDomain, appName, sandbox, labels, data, appData, appHeaders, email, jwt);
     this.customConditions = {};
     this.customActions = {};
     this.programDomain = programDomain;

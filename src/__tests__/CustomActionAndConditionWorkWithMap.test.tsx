@@ -13,6 +13,8 @@ test('custom action and conditions work with map', async () => {
     {},
     {},
     {},
+    undefined,
+    undefined,
     new MockNativeLayer());
 
   extole.registerAction('REACT_ACTION', CustomReactAction.prototype);

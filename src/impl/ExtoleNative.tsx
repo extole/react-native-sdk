@@ -28,7 +28,9 @@ export class ExtoleNative {
               labels: [] = [],
               data: Record<string, string> = {},
               appData: Record<string, string> = {},
-              appHeaders: Record<string, string> = {}) {
+              appHeaders: Record<string, string> = {},
+              email: string | undefined = undefined,
+              jwt: string | undefined = undefined) {
     try {
       ExtoleMobileSdk.init(programDomain, {
         appName: appName,
@@ -37,6 +39,8 @@ export class ExtoleNative {
         data: data,
         appData: appData,
         appHeaders: appHeaders,
+        email: email,
+        jwt: jwt,
       });
     } catch (exception) {
       console.error('Failed to initialize Extole', exception);

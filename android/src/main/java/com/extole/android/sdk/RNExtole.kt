@@ -46,6 +46,7 @@ class RNExtole(reactContext: ReactApplicationContext?) :
         val sandbox: String = parameters.getString("sandobx") ?: "production-production"
         val appName: String = parameters.getString("appName") ?: "Extole $programDomain"
         val email: String? = parameters.getString("email")
+        val jwt: String? = parameters.getString("jwt")
         val listenToEvents: Boolean =
             if (parameters.hasKey("listenToEvents")) parameters.getBoolean("listenToEvents") else true
         if (extole == null) {
@@ -71,7 +72,8 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                             disabledActions = setOf(
                                 Action.ActionType.VIEW_FULLSCREEN,
                                 Action.ActionType.PROMPT
-                            )
+                            ),
+                            jwt
                         )
                     } catch (exception: Exception) {
                         Log.e("Extole", "Unable to initialize Extole", exception)

@@ -12,8 +12,10 @@ export class ExtoleImpl extends ExtoleInternalImpl {
     labels: [] = [],
     data: Record<string, string> = {},
     appData: Record<string, string> = {},
-    appHeaders: Record<string, string> = {}) {
-    super(programDomain, appName, sandbox, labels, data, appData, appHeaders);
+    appHeaders: Record<string, string> = {},
+    email: string | undefined = undefined,
+    jwt: string | undefined = undefined) {
+    super(programDomain, appName, sandbox, labels, data, appData, appHeaders, email, jwt);
     this.registerDefaultActions()
   }
 

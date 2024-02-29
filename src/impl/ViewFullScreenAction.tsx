@@ -35,6 +35,7 @@ export class ViewFullScreenAction implements Action {
         style={{
           width: Dimensions.get('window').width,
           height: Dimensions.get('window').height,
+          backgroundColor: 'transparent'
         }}
         injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
         originWhitelist={['http://*', 'https://*', 'sms:*', 'tel:*', 'mailto:*']}
