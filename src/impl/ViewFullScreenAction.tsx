@@ -68,8 +68,8 @@ export class ViewFullScreenAction implements Action {
               await Share.share(
                 {
                   title: param.title,
-                  message: [param.text, param.url].filter(Boolean).join(' '),
-                  url: param.url,
+                  message: param.text,
+                  url: param.url ?? '',
                 },
                 {
                   dialogTitle: param.title,
