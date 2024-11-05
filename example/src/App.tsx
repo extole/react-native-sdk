@@ -1,17 +1,23 @@
 import type { ReactElement } from 'react';
 import * as React from 'react';
 
-import { Button, Image, StyleSheet, Text, View } from 'react-native';
+import {Button, Image, StyleSheet, Text, TextInput, View} from 'react-native';
 import type { Zone } from '../../src/index';
 import { Extole } from '../../src/index';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  useColorScheme,
+} from 'react-native';
 
-const jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6IjUzNmQwNWE2LTMzZWUtNDI2NC04ODI2LW" +
-  "JhZDRjOTAyMWZhZiJ9.eyJpc3MiOiJtb2JpbGUtc2RrLmV4dG9sZS5jb20iLCJhdWQiOlsiZXh0b2xlLmNvbSJ" +
-  "dLCJlbWFpbCI6InNka3BlcnNvbi1lbWFpbEBtYWlsb3NhdXIuY29tIiwiaWF0IjoxNzA1NTg0Mjg0LCJleHAiO" +
-  "jI0ODMxODQyODR9.XdB5-j58GcEeKqKkCLd5f_G78CLLJIHCmsfcOpH-n3o"
-const extole = new Extole('mobile-monitor.extole.io', 'react-native', 'production-production', [], {}, {}, {}, undefined, jwt);
+
+const extole = new Extole('mobile-monitor.extole.io', 'react-native', 'production-production');
 
 const Stack = createStackNavigator();
 export default function App() {
@@ -36,6 +42,7 @@ function ExtoleScreen(): ReactElement {
 function HomeScreen({ navigation }: { navigation: any }) {
   const [extoleView, setExtoleView] = React.useState<React.ReactNode>(<View />);
   const [zone, setZone] = React.useState<Zone | null>(null);
+  const [text, onChangeText] = React.useState('Useless Text');
   extole.configure(extoleView, setExtoleView, () => {
     navigation.navigate('Promo');
   });
@@ -54,8 +61,11 @@ function HomeScreen({ navigation }: { navigation: any }) {
       });
   }, []);
 
-  const onCtaButtonPress = () => {
-    extole.sendEvent('deeplink', { 'extole_item': 'value' });
+  const login = () => {
+    extole.sendEvent('deeplink', { 'email': text, 'extole_item': 'value' });
+  };
+  const logout = () => {
+    extole.logout()
   };
   return (
     <View style={styles.container}>
@@ -67,7 +77,14 @@ function HomeScreen({ navigation }: { navigation: any }) {
       />
       <View style={styles.space} />
       <Text>This is a Demo App that may not contain content if there is no internet connection</Text>
-      <Button title={zone?.getData().title || ''} onPress={onCtaButtonPress} />
+      <SafeAreaView style={{ marginTop: 20, height: 300 }}>
+          {extole.webView("microsite", {"email": "demoemail@mailosaur.com"})}
+      </SafeAreaView>
+      <Text>Enter your email:</Text>
+      <TextInput onChangeText={onChangeText} style={{borderWidth: 1, width: 300}}></TextInput>
+      <Button title="Login" onPress={login} />
+      <Button title="Logout" onPress={logout} />
+      <Text>Current timestamp: {zone?.getData().timestamp}</Text>
       <View style={styles.space} />
     </View>
   );

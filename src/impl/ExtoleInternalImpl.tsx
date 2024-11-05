@@ -13,6 +13,8 @@ import type { Logger } from 'src/Logger';
 import { LoggerImpl } from './LoggerImpl';
 import { ZoneImpl } from './ZoneImpl';
 import { CampaignImpl } from './CampaignImpl';
+import WebView, { WebViewMessageEvent } from 'react-native-webview';
+import { Linking, Share, Dimensions } from 'react-native';
 
 
 export class ExtoleInternalImpl implements ExtoleInternal {
@@ -81,6 +83,94 @@ export class ExtoleInternalImpl implements ExtoleInternal {
         this.toJson(resultData.zone)), campaign];
     });
   };
+
+  public webView(zoneName: string, queryParameters: {}, configuration:{width: string | number, height: string | number} | undefined = undefined): Element {
+
+    const injectedJavaScriptBeforeContentLoaded = `
+      if (navigator.share == null) {
+        navigator.share = (param) => {
+           window.ReactNativeWebView.postMessage('share:' + JSON.stringify(param));
+        };
+      };
+      if (window.extoleShare === undefined) {
+        window.extoleShare = {}
+        window.extoleShare.share = (param) => {
+           window.ReactNativeWebView.postMessage('share:' + JSON.stringify(param));
+        };
+      };
+      true;`;
+
+      const buildUrl = (url: string, params: any): string => {    
+        const newUrl = new URL(url);
+        Object.keys(params).forEach(key => newUrl.searchParams.append(key, params[key]));
+        return newUrl.toString();
+    }
+
+    interface WebShareAPIParam {
+        url?: string;
+        text?: string;
+        title?: string;
+    }
+
+    var allQueryParameter = {...queryParameters}
+    var urlToOpen = buildUrl("https://" + this.programDomain + "/zone/" + zoneName, allQueryParameter)
+
+    return (<WebView
+      scrollEnabled={true}
+      style={{ height: configuration?.height ?? 200, width: configuration?.width ?? Dimensions.get('window').width, backgroundColor: 'red' }}
+      startInLoadingState={true}
+      injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
+      originWhitelist={['http://*', 'https://*', 'sms:*', 'tel:*', 'mailto:*']}
+      onShouldStartLoadWithRequest={(request) => {
+          if (request.url.startsWith('blob')) {
+              console.error('Link cannot be opened.');
+              return false;
+          }
+
+          if (request.url.startsWith('tel:') ||
+              request.url.startsWith('mailto:') ||
+              request.url.startsWith('sms:')
+          ) {
+              Linking.openURL(request.url).catch(error => {
+                  console.error('Failed to open Link: ' + error.message);
+              });
+              return false;
+          }
+          return true;
+      }}
+      onLoadEnd={() => {
+
+      }}
+      onMessage={async (event: WebViewMessageEvent) => {
+          const { data } = event.nativeEvent;
+          if (data.startsWith('share:')) {
+              try {
+                  const param: WebShareAPIParam = JSON.parse(JSON.parse(data.slice('share:'.length)));
+                  if (param.url == null && param.text == null) {
+                      return;
+                  }
+
+                  await Share.share(
+                      {
+                          title: param.title,
+                          message: param.text,
+                          url: param.url ?? '',
+                      },
+                      {
+                          dialogTitle: param.title,
+                          subject: param.title,
+                      },
+                  );
+              } catch (error: unknown) {
+                  console.error('WebView error', error);
+              }
+          }
+      }}
+      source={{
+          uri: urlToOpen,
+      }}
+  />);
+  }
 
   public configure(
     extoleView: React.ReactNode,
