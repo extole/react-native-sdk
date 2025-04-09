@@ -18,6 +18,7 @@ class ExtoleMobileSdk: NSObject {
         extole = ExtoleImpl(programDomain: "https://" + (programDomain as String), applicationName: appName,
           personIdentifier: email, applicationData: appData, data: data, labels: labels, sandbox: sandbox,
           listenToEvents: true, disabledActions: [ActionType.PROMPT, ActionType.VIEW_FULLSCREEN], jwt: jwt)
+        resolve(true)
     }
 
     @objc(sendEvent:withData:withResolver:withRejecter:)
