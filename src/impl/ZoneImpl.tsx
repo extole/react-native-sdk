@@ -29,4 +29,12 @@ export class ZoneImpl implements Zone {
   public getName(): string {
     return this.name;
   }
+
+  toJSON() {
+    return {
+      name: this.name,
+      data: this.data,
+      campaign: this.campaign
+    };
+  }
 }

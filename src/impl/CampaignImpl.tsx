@@ -59,4 +59,11 @@ export class CampaignImpl implements Campaign {
     return this.campaignId;
   }
 
+  toJSON() {
+    return {
+      programLabel: this.programLabel,
+      campaignId: this.campaignId
+    };
+  }
+
 }
