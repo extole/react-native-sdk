@@ -1,6 +1,6 @@
 {
   "name": "@extole/react-native-sdk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Extole React Native SDK",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
