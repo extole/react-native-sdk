@@ -7,14 +7,6 @@ import type { Extole } from '../Extole';
 let logLevel = LogLevel.ERROR
 test('custom action and conditions work with map', async () => {
   const extole = new ExtoleInternalImpl('https://mobile-monitor.extole.io',
-    'react-native-test',
-    'production-test',
-    [],
-    {},
-    {},
-    {},
-    undefined,
-    undefined,
     new MockNativeLayer());
 
   extole.registerAction('REACT_ACTION', CustomReactAction.prototype);
@@ -39,7 +31,8 @@ class MockNativeLayer extends ExtoleNative {
   appHeaders: Record<string, string> = {};
 
   public init(programDomain: string, appName: string, sandbox: string, labels: [] = [],
-              data: Record<string, string> = {}, appData: Record<string, string> = {}, appHeaders: Record<string, string> = {}) {
+              data: Record<string, string> = {}, appData: Record<string, string> = {}, appHeaders: Record<string, string> = {},
+              _email: string | undefined = undefined, _jwt: string | undefined = undefined): Promise<void> {
     this.programDomain = programDomain;
     this.appName = appName;
     this.sandbox = sandbox;
@@ -47,6 +40,7 @@ class MockNativeLayer extends ExtoleNative {
     this.data = data;
     this.appData = appData;
     this.appHeaders = appHeaders;
+    return Promise.resolve();
   }
 
 
@@ -77,6 +71,38 @@ class MockNativeLayer extends ExtoleNative {
       '    }' +
       '  ]' +
       '}]');
+  }
+
+  debug(message: string) {
+    console.log('DEBUG:', message);
+  }
+
+  info(message: string) {
+    console.log('INFO:', message);
+  }
+
+  warn(message: string) {
+    console.log('WARN:', message);
+  }
+
+  error(message: string) {
+    console.log('ERROR:', message);
+  }
+
+  identify(_email: string, _params: Record<string, string>) {
+    return 'mock-identify-result';
+  }
+
+  identifyJwt(_jwt: string, _params: Record<string, string>) {
+    return 'mock-identify-jwt-result';
+  }
+
+  getAccessToken() {
+    return 'mock-access-token';
+  }
+
+  logout() {
+    console.log('Mock logout called');
   }
 }
 

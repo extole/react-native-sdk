@@ -36,20 +36,43 @@ export class ExtoleInternalImpl implements ExtoleInternal {
 
   constructor(
     programDomain: string,
+    extoleNative: ExtoleNative = new ExtoleNative()) {
+    this.extoleNative = extoleNative;
+    this.customConditions = {};
+    this.customActions = {};
+    this.programDomain = programDomain;
+  }
+
+  static async create(
+    programDomain: string,
     appName = 'react-native',
     sandbox = 'production-production',
     labels: [] = [],
     data: Record<string, string> = {},
     appData: Record<string, string> = {},
     appHeaders: Record<string, string> = {},
-    email: string | undefined,
-    jwt: string | undefined,
-    extoleNative: ExtoleNative = new ExtoleNative()) {
-    this.extoleNative = extoleNative;
-    extoleNative.init(programDomain, appName, sandbox, labels, data, appData, appHeaders, email, jwt);
-    this.customConditions = {};
-    this.customActions = {};
-    this.programDomain = programDomain;
+    email?: string,
+    jwt?: string,
+    extoleNative: ExtoleNative = new ExtoleNative()
+  ): Promise<ExtoleInternalImpl> {
+    try {
+      await extoleNative.init(
+        programDomain,
+        appName,
+        sandbox,
+        labels,
+        data,
+        appData,
+        appHeaders,
+        email,
+        jwt
+      );
+
+      return new ExtoleInternalImpl(programDomain, extoleNative);
+    } catch (error) {
+      console.error('Failed to initialize Extole:', error);
+      throw error;
+    }
   }
 
   getLogger(): Logger {
@@ -100,7 +123,7 @@ export class ExtoleInternalImpl implements ExtoleInternal {
       };
       true;`;
 
-      const buildUrl = (url: string, params: any): string => {    
+      const buildUrl = (url: string, params: any): string => {
         const newUrl = new URL(url);
         Object.keys(params).forEach(key => newUrl.searchParams.append(key, params[key]));
         return newUrl.toString();

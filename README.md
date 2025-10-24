@@ -28,12 +28,11 @@ Initialize Extole:
 import {Extole} from '@extole/extole-mobile-sdk';
 
 
-const extole = new Extole('share.client.com', 'your-app-name');
+const extole = new Extole('share.client.com');
 ```
 
 
-You’ll need to provide your Extole program domain in place of `'share.client.com'`. Be sure to also replace `'your-app-name'` with a descriptive name for your application.
-
+You’ll need to provide your Extole program domain in place of `'share.client.com'`. 
 
 ## Initialize View
 

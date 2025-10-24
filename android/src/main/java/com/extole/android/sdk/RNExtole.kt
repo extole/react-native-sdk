@@ -30,8 +30,10 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     @ReactMethod
     fun init(
         programDomain: String,
-        parameters: ReadableMap
+        parameters: ReadableMap,
+        promise: Promise
     ) {
+
         val labelsSet: Set<String> =
             parameters.getArray("labels")?.toArrayList()?.map { it.toString() }?.toSet()
                 ?: emptySet()
@@ -49,12 +51,13 @@ class RNExtole(reactContext: ReactApplicationContext?) :
         val jwt: String? = parameters.getString("jwt")
         val listenToEvents: Boolean =
             if (parameters.hasKey("listenToEvents")) parameters.getBoolean("listenToEvents") else true
-        if (extole == null) {
-            synchronized(this) {
-                val additionaProtocolHandler = listOf<ProtocolHandler>()
 
-                if (extole == null) {
-                    try {
+        if (extole == null) {
+            val additionalProtocolHandler = listOf<ProtocolHandler>()
+
+            synchronized(this) {
+                executeWithPromise(promise) {
+                    if (extole == null) {
                         Log.d("Extole", "Extole React initialized")
                         extole = ExtoleImpl(
                             programDomain,
@@ -67,7 +70,7 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                             appHeadersMap.toMutableMap(),
                             email,
                             listenToEvents,
-                            additionaProtocolHandler,
+                            additionalProtocolHandler,
                             null,
                             disabledActions = setOf(
                                 Action.ActionType.VIEW_FULLSCREEN,
@@ -75,8 +78,6 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                             ),
                             jwt
                         )
-                    } catch (exception: Exception) {
-                        Log.e("Extole", "Unable to initialize Extole", exception)
                     }
                 }
             }
@@ -191,7 +192,12 @@ class RNExtole(reactContext: ReactApplicationContext?) :
     ) {
         GlobalScope.launch {
             try {
-                promise.resolve(closure())
+              val result = closure()
+              if (result == Unit || result == null) {
+                promise.resolve(null)
+              } else {
+                promise.resolve(result)
+              }
             } catch (e: Exception) {
                 Log.e("Extole", "Exception " + e.stackTraceToString())
                 promise.reject("Extole execution failed", e)
@@ -219,10 +225,12 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                     ReadableType.Map -> deconstructedMap[key] = recursivelyDeconstructReadableMap(
                         readableMap.getMap(key)
                     )
+
                     ReadableType.Array -> deconstructedMap[key] =
                         recursivelyDeconstructReadableArray(
                             readableMap.getArray(key)
                         )
+
                     else -> throw IllegalArgumentException("Could not convert object with key: $key.")
                 }
             }
@@ -245,10 +253,12 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                         i,
                         recursivelyDeconstructReadableMap(readableArray.getMap(i))
                     )
+
                     ReadableType.Array -> deconstructedList.add(
                         i,
                         recursivelyDeconstructReadableArray(readableArray.getArray(i))
                     )
+
                     else -> throw java.lang.IllegalArgumentException("Could not convert object at index $i.")
                 }
             }
@@ -317,6 +327,7 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                         key,
                         convertMapToJson(readableMap.getMap(key))
                     )
+
                     ReadableType.Array -> jsonObject.put(
                         key,
                         convertArrayToJson(readableMap.getArray(key))
@@ -332,6 +343,7 @@ class RNExtole(reactContext: ReactApplicationContext?) :
                 when (readableArray.getType(i)) {
                     ReadableType.Null -> {
                     }
+
                     ReadableType.Boolean -> array.put(readableArray.getBoolean(i))
                     ReadableType.Number -> array.put(readableArray.getDouble(i))
                     ReadableType.String -> array.put(readableArray.getString(i))

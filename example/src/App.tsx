@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 
 
-const extole = new Extole('mobile-monitor.extole.io', 'react-native', 'production-production');
+const extole = new Extole('mobile-monitor.extole.io');
 
 const Stack = createStackNavigator();
 export default function App() {
