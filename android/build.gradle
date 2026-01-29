@@ -157,7 +157,7 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.extole.mobile:android-sdk:1.0.68'
+  implementation 'com.extole.mobile:android-sdk:1.0.69'
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
   // From node_modules
 }
