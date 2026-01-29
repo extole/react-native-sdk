@@ -290,4 +290,3 @@ Used to configure the log level (DEBUG, INFO, WARN, ERROR)
 }
 ```
 
-
