@@ -5,7 +5,14 @@ import type { AppEvent } from './impl/AppEvent';
 import type { Operation } from './impl/Operation';
 import type { Zone } from './Zone';
 import type { Campaign } from './Campaign';
+import {
+  isNativeShareMessage,
+  nativeShareScript,
+  openNativeShareSheet,
+} from './NativeShare';
 
 export type { Condition, Action, AppEvent, Operation, Zone, Campaign };
 
 export { ExtoleImpl as Extole };
+
+export { isNativeShareMessage, nativeShareScript, openNativeShareSheet };

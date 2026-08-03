@@ -2,8 +2,13 @@ import WebView, { WebViewMessageEvent } from 'react-native-webview';
 import type { Action } from '../Action';
 import type { AppEvent } from './AppEvent';
 import type { ExtoleInternal } from './ExtoleInternal';
-import { Dimensions, Linking, Share } from 'react-native';
+import { Dimensions, Linking } from 'react-native';
 import React from 'react';
+import {
+  isNativeShareMessage,
+  nativeShareScript,
+  openNativeShareSheet,
+} from '../NativeShare';
 
 
 export class ViewFullScreenAction implements Action {
@@ -37,7 +42,7 @@ export class ViewFullScreenAction implements Action {
           height: Dimensions.get('window').height,
           backgroundColor: 'transparent'
         }}
-        injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
+        injectedJavaScriptBeforeContentLoaded={nativeShareScript}
         originWhitelist={['http://*', 'https://*', 'sms:*', 'tel:*', 'mailto:*']}
         onShouldStartLoadWithRequest={(request) => {
           if (request.url.startsWith('blob')) {
@@ -58,24 +63,9 @@ export class ViewFullScreenAction implements Action {
         }}
         onMessage={async (event: WebViewMessageEvent) => {
           const { data } = event.nativeEvent;
-          if (data.startsWith('share:')) {
+          if (isNativeShareMessage(data)) {
             try {
-              const param: WebShareAPIParam = JSON.parse(JSON.parse(data.slice('share:'.length)));
-              if (param.url == null && param.text == null) {
-                return;
-              }
-
-              await Share.share(
-                {
-                  title: param.title,
-                  message: param.text,
-                  url: param.url ?? '',
-                },
-                {
-                  dialogTitle: param.title,
-                  subject: param.title,
-                },
-              );
+              await openNativeShareSheet(data);
             } catch (error: unknown) {
               console.error('WebView error', error);
             }
@@ -89,24 +79,4 @@ export class ViewFullScreenAction implements Action {
     );
     extole.navigationCallback();
   }
-}
-
-const injectedJavaScriptBeforeContentLoaded = `
-      if (navigator.share == null) {
-        navigator.share = (param) => {
-           window.ReactNativeWebView.postMessage('share:' + JSON.stringify(param));
-        };
-      };
-      if (window.extoleShare === undefined) {
-        window.extoleShare = {}
-        window.extoleShare.share = (param) => {
-           window.ReactNativeWebView.postMessage('share:' + JSON.stringify(param));
-        };
-      };
-      true;`;
-
-interface WebShareAPIParam {
-  url?: string;
-  text?: string;
-  title?: string;
 }

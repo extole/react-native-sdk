@@ -14,7 +14,12 @@ import { LoggerImpl } from './LoggerImpl';
 import { ZoneImpl } from './ZoneImpl';
 import { CampaignImpl } from './CampaignImpl';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
-import { Linking, Share, Dimensions } from 'react-native';
+import { Linking, Dimensions } from 'react-native';
+import {
+  isNativeShareMessage,
+  nativeShareScript,
+  openNativeShareSheet,
+} from '../NativeShare';
 
 
 export class ExtoleInternalImpl implements ExtoleInternal {
@@ -109,30 +114,10 @@ export class ExtoleInternalImpl implements ExtoleInternal {
 
   public webView(zoneName: string, queryParameters: {}, configuration:{width: string | number, height: string | number} | undefined = undefined): Element {
 
-    const injectedJavaScriptBeforeContentLoaded = `
-      if (navigator.share == null) {
-        navigator.share = (param) => {
-           window.ReactNativeWebView.postMessage('share:' + JSON.stringify(param));
-        };
-      };
-      if (window.extoleShare === undefined) {
-        window.extoleShare = {}
-        window.extoleShare.share = (param) => {
-           window.ReactNativeWebView.postMessage('share:' + JSON.stringify(param));
-        };
-      };
-      true;`;
-
-      const buildUrl = (url: string, params: any): string => {
+    const buildUrl = (url: string, params: any): string => {
         const newUrl = new URL(url);
         Object.keys(params).forEach(key => newUrl.searchParams.append(key, params[key]));
         return newUrl.toString();
-    }
-
-    interface WebShareAPIParam {
-        url?: string;
-        text?: string;
-        title?: string;
     }
 
     var allQueryParameter = {...queryParameters}
@@ -142,7 +127,7 @@ export class ExtoleInternalImpl implements ExtoleInternal {
       scrollEnabled={true}
       style={{ height: configuration?.height ?? 200, width: configuration?.width ?? Dimensions.get('window').width, backgroundColor: 'red' }}
       startInLoadingState={true}
-      injectedJavaScriptBeforeContentLoaded={injectedJavaScriptBeforeContentLoaded}
+      injectedJavaScriptBeforeContentLoaded={nativeShareScript}
       originWhitelist={['http://*', 'https://*', 'sms:*', 'tel:*', 'mailto:*']}
       onShouldStartLoadWithRequest={(request) => {
           if (request.url.startsWith('blob')) {
@@ -166,24 +151,9 @@ export class ExtoleInternalImpl implements ExtoleInternal {
       }}
       onMessage={async (event: WebViewMessageEvent) => {
           const { data } = event.nativeEvent;
-          if (data.startsWith('share:')) {
+          if (isNativeShareMessage(data)) {
               try {
-                  const param: WebShareAPIParam = JSON.parse(JSON.parse(data.slice('share:'.length)));
-                  if (param.url == null && param.text == null) {
-                      return;
-                  }
-
-                  await Share.share(
-                      {
-                          title: param.title,
-                          message: param.text,
-                          url: param.url ?? '',
-                      },
-                      {
-                          dialogTitle: param.title,
-                          subject: param.title,
-                      },
-                  );
+                  await openNativeShareSheet(data);
               } catch (error: unknown) {
                   console.error('WebView error', error);
               }
