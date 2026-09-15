@@ -5,7 +5,7 @@ import type { Condition } from '../Condition';
 import type { Action } from '../Action';
 import type { AppEvent } from './AppEvent';
 import type { Operation } from './Operation';
-import React, { Component } from 'react';
+import React from 'react';
 import type { ExtoleInternal } from './ExtoleInternal';
 import { ExtoleNative } from './ExtoleNative';
 import { LogLevel } from '../LogLevel';
@@ -13,13 +13,10 @@ import type { Logger } from 'src/Logger';
 import { LoggerImpl } from './LoggerImpl';
 import { ZoneImpl } from './ZoneImpl';
 import { CampaignImpl } from './CampaignImpl';
-import WebView, { WebViewMessageEvent } from 'react-native-webview';
-import { Linking, Dimensions } from 'react-native';
 import {
-  isNativeShareMessage,
-  nativeShareScript,
-  openNativeShareSheet,
-} from '../NativeShare';
+  DeferredZoneWebView,
+  type ZoneWebViewConfiguration,
+} from './ZoneWebView';
 
 
 export class ExtoleInternalImpl implements ExtoleInternal {
@@ -35,17 +32,26 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     () => {
       // no default behavior
     };
-  view: React.ReactNode = new Component({});
+  view: React.ReactNode = (<View></View>);
   extoleNative: ExtoleNative;
-
+  private readonly initialization: Promise<void>;
 
   constructor(
     programDomain: string,
-    extoleNative: ExtoleNative = new ExtoleNative()) {
+    extoleNative: ExtoleNative = new ExtoleNative(),
+    initialization?: Promise<void>,
+  ) {
     this.extoleNative = extoleNative;
     this.customConditions = {};
     this.customActions = {};
     this.programDomain = programDomain;
+    this.initialization =
+      initialization ??
+      this.extoleNative.init(programDomain).catch((error: unknown) => {
+        console.error('Failed to initialize Extole:', error);
+        throw error;
+      });
+    this.initialization.catch(() => undefined);
   }
 
   static async create(
@@ -73,7 +79,11 @@ export class ExtoleInternalImpl implements ExtoleInternal {
         jwt
       );
 
-      return new ExtoleInternalImpl(programDomain, extoleNative);
+      return new ExtoleInternalImpl(
+        programDomain,
+        extoleNative,
+        Promise.resolve(),
+      );
     } catch (error) {
       console.error('Failed to initialize Extole:', error);
       throw error;
@@ -95,7 +105,8 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     return this.programDomain;
   }
 
-  public setViewElement(view: Element) {
+  public setViewElement(view: React.ReactElement) {
+    this.view = view;
     this.viewHandler(view);
   }
 
@@ -103,66 +114,32 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     zoneName: string,
     data: Record<string, string> = {},
   ): Promise<[Zone, Campaign]> => {
-    return this.extoleNative.fetchZone(zoneName, data).then((result: string) => {
-      const resultData = this.toJson(result);
-      const campaign = new CampaignImpl(this, resultData.campaign_id,
-        resultData.program_label);
-      return [new ZoneImpl(campaign, zoneName,
-        this.toJson(resultData.zone)), campaign];
-    });
+    return this.initialization.then(() =>
+      this.extoleNative.fetchZone(zoneName, data).then((result: string) => {
+        const resultData = this.toJson(result);
+        const campaign = new CampaignImpl(this, resultData.campaign_id,
+          resultData.program_label);
+        return [new ZoneImpl(campaign, zoneName,
+          this.toJson(resultData.zone)), campaign];
+      }),
+    );
   };
 
-  public webView(zoneName: string, queryParameters: {}, configuration:{width: string | number, height: string | number} | undefined = undefined): Element {
-
-    const buildUrl = (url: string, params: any): string => {
-        const newUrl = new URL(url);
-        Object.keys(params).forEach(key => newUrl.searchParams.append(key, params[key]));
-        return newUrl.toString();
-    }
-
-    var allQueryParameter = {...queryParameters}
-    var urlToOpen = buildUrl("https://" + this.programDomain + "/zone/" + zoneName, allQueryParameter)
-
-    return (<WebView
-      scrollEnabled={true}
-      style={{ height: configuration?.height ?? 200, width: configuration?.width ?? Dimensions.get('window').width, backgroundColor: 'red' }}
-      startInLoadingState={true}
-      injectedJavaScriptBeforeContentLoaded={nativeShareScript}
-      originWhitelist={['http://*', 'https://*', 'sms:*', 'tel:*', 'mailto:*']}
-      onShouldStartLoadWithRequest={(request) => {
-          if (request.url.startsWith('blob')) {
-              console.error('Link cannot be opened.');
-              return false;
-          }
-
-          if (request.url.startsWith('tel:') ||
-              request.url.startsWith('mailto:') ||
-              request.url.startsWith('sms:')
-          ) {
-              Linking.openURL(request.url).catch(error => {
-                  console.error('Failed to open Link: ' + error.message);
-              });
-              return false;
-          }
-          return true;
-      }}
-      onLoadEnd={() => {
-
-      }}
-      onMessage={async (event: WebViewMessageEvent) => {
-          const { data } = event.nativeEvent;
-          if (isNativeShareMessage(data)) {
-              try {
-                  await openNativeShareSheet(data);
-              } catch (error: unknown) {
-                  console.error('WebView error', error);
-              }
-          }
-      }}
-      source={{
-          uri: urlToOpen,
-      }}
-  />);
+  public webView(
+    zoneName: string,
+    queryParameters: Record<string, string>,
+    configuration: ZoneWebViewConfiguration | undefined = undefined,
+  ): React.ReactElement {
+    return (
+      <DeferredZoneWebView
+        programDomain={this.programDomain}
+        zoneName={zoneName}
+        queryParameters={queryParameters}
+        configuration={configuration}
+        initialization={this.initialization}
+        getAccessToken={this.getAccessToken}
+      />
+    );
   }
 
   public configure(
@@ -192,26 +169,30 @@ export class ExtoleInternalImpl implements ExtoleInternal {
     return this.logLevel;
   }
 
-  public getAccessToken(): string {
-    return  this.extoleNative.getAccessToken();
-  }
+  public getAccessToken = (): string | Promise<string> => {
+    return this.extoleNative.getAccessToken();
+  };
 
   public logout(): void {
     this.extoleNative.logout();
   }
 
   private evaluateOperations = (event: AppEvent) => {
-    this.extoleNative.getJsonConfiguration().then(
-      (jsonOperations: string | Record<string, string>) => {
-        const operations: Operation[] = this.toJson(jsonOperations);
-        const actionsToExecute = operations
-          .filter(this.checkConditionTypeExists())
-          .filter(this.filterPassingConditions(event))
-          .flatMap((operation) => operation.actions);
+    this.initialization.then(() =>
+      this.extoleNative.getJsonConfiguration().then(
+        (jsonOperations: string | Record<string, string>) => {
+          const operations: Operation[] = this.toJson(jsonOperations);
+          const actionsToExecute = operations
+            .filter(this.checkConditionTypeExists())
+            .filter(this.filterPassingConditions(event))
+            .flatMap((operation) => operation.actions);
 
-        this.executeActions(actionsToExecute, event);
-      },
-    );
+          this.executeActions(actionsToExecute, event);
+        },
+      ),
+    ).catch((error: unknown) => {
+      console.error('Failed to evaluate Extole operations:', error);
+    });
   };
 
   private checkConditionTypeExists() {

@@ -1,0 +1,9 @@
+appId: com.example.extolemobilesdk
+---
+- extendedWaitUntil:
+    notVisible:
+      id: open-webview-button
+    timeout: 15000
+- assertVisible:
+    text: ".*(?i)(nearby share|copy to clipboard|bluetooth|chromebook|messages).*"
+- back

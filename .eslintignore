@@ -3,6 +3,7 @@ dist
 scripts
 lib
 babel.config.js
+react-native.config.js
 example/react-native.config.js
 example/metro.config.js
 example/babel.config.js

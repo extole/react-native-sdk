@@ -40,7 +40,7 @@ export class ExtoleNative {
         appHeaders: appHeaders,
         email: email,
         jwt: jwt,
-      }).catch((error: any) => {
+      }).catch((error: unknown) => {
         console.error('Failed to initialize Extole:', error);
         throw error;
       });

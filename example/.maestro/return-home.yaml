@@ -1,0 +1,23 @@
+appId: com.example.extolemobilesdk
+---
+- runFlow:
+    when:
+      notVisible:
+        id: native-share-button
+      platform: Android
+    commands:
+      - back
+- runFlow:
+    when:
+      notVisible:
+        id: native-share-button
+      platform: iOS
+    commands:
+      - tapOn: "Home, back"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: native-share-button
+    timeout: 45000
+- assertVisible:
+    id: open-webview-button

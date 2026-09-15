@@ -3,6 +3,7 @@ import type { Action } from './Action';
 import type { Logger } from './Logger';
 import type { Zone } from './Zone';
 import type { Campaign } from './Campaign';
+import type { ReactElement } from 'react';
 
 export interface Extole {
   getProgramDomain: () => string;
@@ -24,5 +25,5 @@ export interface Extole {
 
   registerAction: (title: string, action: Action) => void;
 
-  setViewElement: (view: Element) => void;
+  setViewElement: (view: ReactElement) => void;
 }

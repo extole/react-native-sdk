@@ -1,25 +1,39 @@
 import type { ReactElement } from 'react';
 import * as React from 'react';
 
-import {Button, Image, StyleSheet, Text, TextInput, View} from 'react-native';
-import type { Zone } from '../../src/index';
-import { Extole } from '../../src/index';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import {
-  ActivityIndicator,
-  Dimensions,
+  Button,
+  Image,
   Pressable,
   SafeAreaView,
-  ScrollView,
-  StatusBar,
-  useColorScheme,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
+import type { Zone } from '@extole/react-native-sdk';
+import { Extole } from '@extole/react-native-sdk';
+import { NavigationContainer } from '@react-navigation/native';
+import {
+  createStackNavigator,
+  type StackNavigationProp,
+} from '@react-navigation/stack';
 
+type RootStackParamList = {
+  Home: undefined;
+  Promo: undefined;
+  Microsite: undefined;
+};
 
-const extole = new Extole('mobile-monitor.extole.io');
+const PROGRAM_DOMAIN = 'mobile-monitor.extole.io';
+const MICROSITE_EMAIL = 'demoemail@mailosaur.com';
+const FALLBACK_IMAGE_URI = 'https://reactnative.dev/img/tiny_logo.png';
+const INLINE_WEBVIEW_HEIGHT = 240;
 
-const Stack = createStackNavigator();
+const extole = new Extole(PROGRAM_DOMAIN);
+
+const Stack = createStackNavigator<RootStackParamList>();
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -29,6 +43,11 @@ export default function App() {
           component={HomeScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name='Microsite'
+          component={MicrositeScreen}
+          options={{ title: 'Microsite' }}
+        />
         <Stack.Screen name='Promo' component={ExtoleScreen} />
       </Stack.Navigator>
     </NavigationContainer>
@@ -36,88 +55,197 @@ export default function App() {
 }
 
 function ExtoleScreen(): ReactElement {
-  return extole.view as ReactElement;
+  return <View style={styles.flex}>{extole.view}</View>;
 }
 
-function HomeScreen({ navigation }: { navigation: any }) {
-  const [extoleView, setExtoleView] = React.useState<React.ReactNode>(<View />);
-  const [zone, setZone] = React.useState<Zone | null>(null);
-  const [text, onChangeText] = React.useState('Useless Text');
-  extole.configure(extoleView, setExtoleView, () => {
-    navigation.navigate('Promo');
-  });
-  React.useEffect(() => {
-    extole
-      .fetchZone('mobile_cta')
-      .then(([zone, _campaign]) => {
-        setZone(zone);
-      }).catch((exception: any) => {
-      console.error('Unable to fetch zone', exception);
-    });
-    extole
-      .fetchZone('mobile_cta_timestamp')
-      .then(([zone, _campaign]) => {
-        console.log("Timestamp zone data", zone.getData())
-      });
-  }, []);
-
-  const login = () => {
-    extole.sendEvent('deeplink', { 'email': text, 'extole_item': 'value' });
-  };
-  const logout = () => {
-    extole.logout()
-  };
+function MicrositeScreen(): ReactElement {
   return (
-    <View style={styles.container}>
-      <Image
-        style={styles.tinyLogo}
-        source={{
-          uri: zone?.getData().image || 'https://reactnative.dev/img/tiny_logo.png',
-        }}
-      />
-      <View style={styles.space} />
-      <Text>This is a Demo App that may not contain content if there is no internet connection</Text>
-      <SafeAreaView style={{ marginTop: 20, height: 300 }}>
-          {extole.webView("microsite", {"email": "demoemail@mailosaur.com"})}
-      </SafeAreaView>
-      <Text>Enter your email:</Text>
-      <TextInput onChangeText={onChangeText} style={{borderWidth: 1, width: 300}}></TextInput>
-      <Button title="Login" onPress={login} />
-      <Button title="Logout" onPress={logout} />
-      <Text>Current timestamp: {zone?.getData().timestamp}</Text>
-      <View style={styles.space} />
+    <View style={styles.flex} testID='microsite-screen'>
+      {extole.webView(
+        'microsite',
+        { email: MICROSITE_EMAIL },
+        { width: '100%', height: '100%' }
+      )}
     </View>
   );
 }
 
+function HomeScreen({
+  navigation,
+}: {
+  navigation: StackNavigationProp<RootStackParamList, 'Home'>;
+}) {
+  const [extoleView, setExtoleView] = React.useState<React.ReactNode>(<View />);
+  const [callToActionZone, setCallToActionZone] = React.useState<Zone | null>(
+    null,
+  );
+  const [email, setEmail] = React.useState('demo@extole.com');
+
+  extole.configure(extoleView, setExtoleView, () => {
+    navigation.navigate('Promo');
+  });
+
+  React.useEffect(() => {
+    extole
+      .fetchZone('mobile_cta')
+      .then(([zone]) => {
+        setCallToActionZone(zone);
+        zone.viewed();
+      })
+      .catch((exception: unknown) => {
+        console.error('Unable to fetch zone', exception);
+      });
+  }, []);
+
+  const callToActionImageUri =
+    typeof callToActionZone?.getData().image === 'string'
+      ? (callToActionZone.getData().image as string)
+      : FALLBACK_IMAGE_URI;
+
+  const handleCallToActionPress = () => {
+    if (!callToActionZone) {
+      console.warn('CTA tapped before zone loaded');
+      return;
+    }
+    callToActionZone.tap();
+  };
+
+  const handleLoginPress = () => {
+    extole.sendEvent('deeplink', {
+      email,
+      extole_item: 'value',
+    });
+  };
+
+  const handleLogoutPress = () => {
+    extole.logout();
+  };
+
+  const handleOpenWebViewPress = () => {
+    navigation.navigate('Microsite');
+  };
+
+  return (
+    <SafeAreaView style={styles.flex} testID='home-screen'>
+      <View style={styles.flex}>
+        <Pressable
+          testID='cta-image'
+          accessibilityLabel='cta-image'
+          onPress={handleCallToActionPress}
+          style={styles.callToActionPressable}
+        >
+          <Image
+            style={styles.callToActionImage}
+            source={{ uri: callToActionImageUri }}
+            accessibilityLabel='mobile-cta-image'
+          />
+        </Pressable>
+
+        <Text style={styles.sectionLabel}>Microsite</Text>
+        <View style={styles.inlineWebView} testID='inline-webview'>
+          {extole.webView(
+            'microsite',
+            { email: MICROSITE_EMAIL },
+            { width: '100%', height: '100%' }
+          )}
+        </View>
+
+        <Text style={styles.sectionLabel}>Enter your email</Text>
+        <TextInput
+          testID='email-input'
+          accessibilityLabel='email-input'
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize='none'
+          keyboardType='email-address'
+          style={styles.emailInput}
+        />
+
+        <View style={styles.buttonRow}>
+          <View style={styles.buttonWrap}>
+            <Button
+              testID='login-button'
+              title='Login'
+              onPress={handleLoginPress}
+            />
+          </View>
+          <View style={styles.buttonWrap}>
+            <Button
+              testID='logout-button'
+              title='Logout'
+              onPress={handleLogoutPress}
+            />
+          </View>
+        </View>
+
+        <View style={styles.buttonRow}>
+          <View style={styles.buttonWrap}>
+            <Button
+              testID='native-share-button'
+              title='Native Share'
+              disabled={callToActionZone == null}
+              onPress={handleCallToActionPress}
+            />
+          </View>
+          <View style={styles.buttonWrap}>
+            <Button
+              testID='open-webview-button'
+              title='Open WebView'
+              onPress={handleOpenWebViewPress}
+            />
+          </View>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
 const styles = StyleSheet.create({
-  space: {
-    marginTop: 10,
-  },
-  container: {
+  flex: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#ffffff',
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
-  promoText: {
-    fontSize: 18,
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  button: {
-    marginTop: 10,
-  },
-  tinyLogo: {
+  callToActionPressable: {
     width: '100%',
-    height: 300,
   },
-  logo: {
-    width: 66,
-    height: 58,
+  callToActionImage: {
+    width: '100%',
+    height: 180,
+    backgroundColor: '#eeeeee',
+  },
+  sectionLabel: {
+    marginTop: 12,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    fontSize: 16,
+    color: '#111111',
+  },
+  inlineWebView: {
+    marginHorizontal: 16,
+    height: INLINE_WEBVIEW_HEIGHT,
+    overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#cccccc',
+    backgroundColor: '#ffffff',
+  },
+  emailInput: {
+    marginHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#333333',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: '#111111',
+  },
+  buttonRow: {
+    marginTop: 12,
+    marginHorizontal: 8,
+    marginBottom: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  buttonWrap: {
+    flex: 1,
+    marginHorizontal: 8,
   },
 });

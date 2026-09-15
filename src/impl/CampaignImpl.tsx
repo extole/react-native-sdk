@@ -4,6 +4,7 @@ import type { Condition } from '../Condition';
 import type { Logger } from '../Logger';
 import type { Zone } from '../Zone';
 import type { Campaign } from '../Campaign';
+import type { ReactElement } from 'react';
 
 export class CampaignImpl implements Campaign {
   campaignId: string;
@@ -47,7 +48,7 @@ export class CampaignImpl implements Campaign {
     return this.extole.sendEvent(eventName, params);
   }
 
-  setViewElement(view: Element): void {
+  setViewElement(view: ReactElement): void {
     this.extole.setViewElement(view);
   }
 

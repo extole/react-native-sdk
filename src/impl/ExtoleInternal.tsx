@@ -1,10 +1,11 @@
 import type { Extole } from '../Extole';
 import type { LogLevel } from '../LogLevel';
+import type { ReactElement } from 'react';
 
 export interface ExtoleInternal extends Extole {
-  setViewElement: (view: Element) => void;
+  setViewElement: (view: ReactElement) => void;
   navigationCallback: () => void;
   getLogLevel: () => LogLevel;
 
-  getAccessToken: () => string;
+  getAccessToken: () => string | Promise<string>;
 }

@@ -1,0 +1,19 @@
+appId: com.example.extolemobilesdk
+---
+- extendedWaitUntil:
+    notVisible:
+      id: open-webview-button
+    timeout: 15000
+- assertVisible:
+    text: ".*(?i)(copy|messages|mail|reminders|save to files).*"
+- runFlow:
+    when:
+      visible: "Close"
+    commands:
+      - tapOn: "Close"
+- runFlow:
+    when:
+      notVisible:
+        id: native-share-button
+    commands:
+      - tapOn: "dismiss popup"

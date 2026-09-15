@@ -3,10 +3,10 @@ import type { Zone } from '../Zone';
 
 export class ZoneImpl implements Zone {
   name: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   campaign: Campaign;
 
-  constructor(campaign: Campaign, name: string, data: Record<string, any>) {
+  constructor(campaign: Campaign, name: string, data: Record<string, unknown>) {
     this.name = name;
     this.data = data;
     this.campaign = campaign;
@@ -22,7 +22,7 @@ export class ZoneImpl implements Zone {
       { 'target': 'campaign_id:' + this.campaign.getCampaignId() });
   }
 
-  public getData(): Record<string, any> {
+  public getData(): Record<string, unknown> {
     return this.data;
   }
 

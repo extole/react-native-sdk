@@ -17,6 +17,7 @@ test('custom action and conditions work with map', async () => {
   expect(logLevel).toEqual(LogLevel.ERROR);
 
   await extole.sendEvent('name', {});
+  await new Promise<void>((resolve) => setImmediate(resolve));
 
   expect(logLevel).toEqual(LogLevel.DEBUG);
 });
@@ -44,11 +45,11 @@ class MockNativeLayer extends ExtoleNative {
   }
 
 
-  fetchZone(zoneName: string, data: Record<string, string>): any {
+  fetchZone(zoneName: string, data: Record<string, string>): string {
     return zoneName + ' ' + data;
   }
 
-  sendEvent(eventName: string, params: Record<string, string>): any {
+  sendEvent(eventName: string, params: Record<string, string>): string {
     return eventName + ' ' + params;
   }
 

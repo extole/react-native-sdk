@@ -1,0 +1,31 @@
+# OSX
+.DS_Store
+
+# node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ruby / CocoaPods
+vendor/bundle/
+.bundle/
+ios/Pods/
+ios/build/
+ios/Podfile.lock.bak
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+
+# Android
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+
+# Metro / watchman
+.metro-health-check*
+ios/.xcode.env.local
+ios/derivedData/
+ios/build-arm64/

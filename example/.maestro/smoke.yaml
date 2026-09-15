@@ -1,0 +1,50 @@
+appId: com.example.extolemobilesdk
+name: Example UI smoke
+---
+- launchApp:
+    clearState: false
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: native-share-button
+      enabled: true
+    timeout: 120000
+- assertVisible:
+    id: open-webview-button
+- assertVisible:
+    id: login-button
+- assertVisible:
+    id: logout-button
+
+- tapOn:
+    id: native-share-button
+- runFlow:
+    when:
+      platform: Android
+    file: assert-share-android.yaml
+- runFlow:
+    when:
+      platform: iOS
+    file: assert-share-ios.yaml
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: native-share-button
+    timeout: 45000
+
+- tapOn:
+    id: login-button
+- runFlow:
+    file: return-home.yaml
+
+- tapOn:
+    id: logout-button
+- runFlow:
+    file: return-home.yaml
+
+- tapOn:
+    id: open-webview-button
+- extendedWaitUntil:
+    visible:
+      id: microsite-screen
+    timeout: 30000
