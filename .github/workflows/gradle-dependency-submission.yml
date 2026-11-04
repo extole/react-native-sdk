@@ -1,0 +1,44 @@
+name: Submit Gradle dependencies
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/gradle-dependency-submission.yml
+
+jobs:
+  android:
+    name: Android dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: yarn
+          cache-dependency-path: |
+            yarn.lock
+            example/yarn.lock
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install JS dependencies
+        run: |
+          yarn install --frozen-lockfile
+          yarn --cwd example install --frozen-lockfile
+
+      - name: Submit the resolved dependency graph
+        uses: gradle/actions/dependency-submission@v6
+        with:
+          build-root-directory: example/android
