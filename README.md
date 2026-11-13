@@ -17,6 +17,15 @@ Add the `extole-mobile-sdk` dependency:
 npm install @extole/react-native-sdk react-native-webview
 ```
 
+On iOS, add the Extole iOS SDK to the app's `Podfile`, inside the app target. CocoaPods trunk does not have the versions this SDK needs, so the pods come from GitHub:
+
+```ruby
+pod 'ExtoleMobileSDK', :git => 'https://github.com/extole/ios-sdk.git', :tag => '0.0.103'
+pod 'ExtoleConsumerAPI', :git => 'https://github.com/extole/ios-consumer-api.git', :tag => '0.0.24'
+```
+
+Then, in the `ios` directory, run `pod install`. An app that already has these pods in its `Podfile.lock` runs `pod update ExtoleMobileSDK ExtoleConsumerAPI extole-mobile-sdk` instead.
+
 
 
 ## Initialize SDK

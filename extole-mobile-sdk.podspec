@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 
-  s.dependency "ExtoleMobileSDK", '~> 0.0.90'
+  s.dependency "ExtoleMobileSDK", '~> 0.0.103'
 
   # React Native 0.71+ defines install_modules_dependencies, which declares the pods its own
   # version provides (prebuilt ReactNativeDependencies instead of RCT-Folly, ReactCodegen instead
