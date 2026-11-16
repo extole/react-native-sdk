@@ -17,8 +17,8 @@ end
 target 'ExtoleMobileSdkExample' do
   config = use_native_modules!
 
-  pod 'ExtoleMobileSDK', :git => 'https://github.com/extole/ios-sdk.git', :tag => '0.0.103'
-  pod 'ExtoleConsumerAPI', :git => 'https://github.com/extole/ios-consumer-api.git', :tag => '0.0.24'
+  pod 'ExtoleMobileSDK', :git => 'https://github.com/extole/ios-sdk.git', :tag => '0.0.104'
+  pod 'ExtoleConsumerAPI', :git => 'https://github.com/extole/ios-consumer-api.git', :tag => '0.0.25'
 
   use_react_native!(
     :path => config[:reactNativePath],

@@ -23,9 +23,8 @@ class ExtoleMobileSdk: NSObject {
 
     @objc(sendEvent:withData:withResolver:withRejecter:)
     func sendEvent(eventName: NSString, data: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        extole?.sendEvent(eventName as String, (data as! [String: String]?) ?? [:]) { [self] (idEvent, error) in
+        extole?.sendEvent(eventName as String, (data as! [String: String]?) ?? [:]) { (idEvent, error) in
             if error != nil {
-                self.extole?.getLogger().error(error?.localizedDescription ?? "Unable to load Extole Zone")
                 reject("send_event_failed", error?.localizedDescription ?? "Unable to load Extole Zone", error)
             } else {
                 resolve(idEvent?.getValue())
@@ -35,9 +34,8 @@ class ExtoleMobileSdk: NSObject {
 
     @objc(identify:withData:withResolver:withRejecter:)
     func identify(email: NSString, data: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        extole?.identify(email as String, (data as! [String: String]?) ?? [:]) { [self] (idEvent, error) in
+        extole?.identify(email as String, (data as! [String: String]?) ?? [:]) { (idEvent, error) in
             if error != nil {
-                self.extole?.getLogger().error(error?.localizedDescription ?? "Unable to send identify event")
                 reject("identify_failed", error?.localizedDescription ?? "Unable to send identify event", error)
             } else {
                 resolve(idEvent?.getValue())
@@ -47,9 +45,8 @@ class ExtoleMobileSdk: NSObject {
 
     @objc(identifyJwt:withData:withResolver:withRejecter:)
     func identify(jwt: NSString, data: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        extole?.identifyJwt(jwt as String, (data as! [String: String]?) ?? [:]) { [self] (idEvent, error) in
+        extole?.identifyJwt(jwt as String, (data as! [String: String]?) ?? [:]) { (idEvent, error) in
             if error != nil {
-                self.extole?.getLogger().error(error?.localizedDescription ?? "Unable to send identify event")
                 reject("identify_failed", error?.localizedDescription ?? "Unable to send identify event", error)
             } else {
                 resolve(idEvent?.getValue())
@@ -61,7 +58,6 @@ class ExtoleMobileSdk: NSObject {
     func fetchZone(zoneName: NSString, data: NSDictionary, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         extole?.fetchZone(zoneName as String, (data as! [String: String]?) ?? [:]) { (zone: Zone?, campaign: Campaign?, error: Error?) in
             if error != nil {
-                self.extole?.getLogger().error(error?.localizedDescription ?? "Unable to load Extole Zone")
                 reject("fetch_failed", error?.localizedDescription ?? "Unable to load Extole Zone", error)
             } else {
                 let encoder = JSONEncoder()
